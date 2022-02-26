@@ -1,5 +1,9 @@
-net\simpvp\EventAdditions\DeleteFlagsCommand.class
+net\simpvp\EventAdditions\Timer$1.class
 net\simpvp\EventAdditions\FlagObject.class
 net\simpvp\EventAdditions\EventListener.class
 net\simpvp\EventAdditions\CreateFlagCommand.class
 net\simpvp\EventAdditions\EventAdditions.class
+net\simpvp\EventAdditions\DeleteFlagsCommand.class
+net\simpvp\EventAdditions\Timer.class
+net\simpvp\EventAdditions\TimerCommand.class
+net\simpvp\EventAdditions\Timer$1$1.class

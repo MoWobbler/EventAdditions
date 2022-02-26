@@ -30,7 +30,7 @@ public class CreateFlagCommand implements CommandExecutor {
     boolean isOutputDefined;
     boolean isNameDefined;
 
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
         if (!(sender instanceof BlockCommandSender)) {
             sender.sendMessage(ChatColor.RED + "This command can only be run in a command block");

@@ -12,6 +12,8 @@ public class EventAdditions extends JavaPlugin {
         getCommand("createflag").setExecutor(new CreateFlagCommand());
         getCommand("deleteflags").setExecutor(new DeleteFlagsCommand());
         getServer().getPluginManager().registerEvents(new EventListener(), this);
+        getCommand("timer").setExecutor(new TimerCommand());
+        getCommand("stoptimers").setExecutor(new TimerCommand());
     }
 
 }
