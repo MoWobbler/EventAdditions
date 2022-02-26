@@ -1,0 +1,11 @@
+name: EventAdditions
+main: net.simpvp.EventAdditions.EventAdditions
+version: 1
+author: simpvp.net
+description: more event features
+api-version: 1.13
+commands:
+  createflag:
+    description: create a flag
+  deleteflags:
+    description: delete all flags
