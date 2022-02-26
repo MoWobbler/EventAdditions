@@ -9,3 +9,7 @@ commands:
     description: create a flag
   deleteflags:
     description: delete all flags
+  timer:
+    description: start a timer
+  stoptimers:
+    description: stop all timer

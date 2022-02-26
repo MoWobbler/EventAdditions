@@ -16,11 +16,10 @@ public class CreateFlagCommand implements CommandExecutor {
     public static ArrayList<FlagObject> flags = new ArrayList<>();
 
     Location startingLocation;
+    Location finalLocation = new Location(null, 0, 0, 0);
 
     int finalX, finalY, finalZ;
-
     String flagName;
-
     boolean redstoneOutput = false;
     Team team = null;
 
@@ -31,10 +30,7 @@ public class CreateFlagCommand implements CommandExecutor {
     boolean isOutputDefined;
     boolean isNameDefined;
 
-
-    Location finalLocation = new Location(null, 0, 0, 0);
-
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
         if (!(sender instanceof BlockCommandSender)) {
             sender.sendMessage(ChatColor.RED + "This command can only be run in a command block");
