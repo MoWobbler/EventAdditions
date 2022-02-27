@@ -13,10 +13,15 @@ public class Timer {
     BukkitTask bukkitTask1;
     BukkitTask bukkitTask2;
 
+    int x, z, y;
 
-    public Timer(Location timerLocation, int seconds) {
+
+    public Timer(Location timerLocation, int seconds, int x, int y, int z) {
         this.timerLocation = timerLocation;
         this.seconds = seconds;
+        this.x = x;
+        this.y = y;
+        this.z = z;
         startTimer();
     }
 
@@ -48,7 +53,7 @@ public class Timer {
 
     /* Place redstone block */
     public void placeRedstoneOutput() {
-        timerLocation.getBlock().getRelative(0,2,0).setType(Material.REDSTONE_BLOCK);
+        timerLocation.getBlock().getRelative(x,y,z).setType(Material.REDSTONE_BLOCK);
     }
 
 
