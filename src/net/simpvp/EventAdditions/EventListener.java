@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.Team;
@@ -19,8 +20,8 @@ public class EventListener implements Listener {
         Team team = e.getPlayer().getScoreboard().getPlayerTeam(e.getPlayer());
 
         for (FlagObject flag: CreateFlagCommand.flags) {
-            if (flag.getIsCaptured()) return;
-            if (flag.getTeam().equals(team)) return;
+            if (flag.getIsCaptured()) continue;
+            if (flag.getTeam().equals(team)) continue;
             if (flag.isPlayerNear(e.getPlayer().getLocation()) && !flag.getIsTaskActive()) {
                 flag.nearbyPlayers.add(e.getPlayer());
                 flag.startTimerTask();
@@ -58,6 +59,13 @@ public class EventListener implements Listener {
         Team team = e.getPlayer().getScoreboard().getPlayerTeam(e.getPlayer());
         if (team != null) {
             e.setFormat("<" + team.getColor() + e.getPlayer().getName()  + ChatColor.RESET + "> " + e.getMessage());
+        }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        for (FlagObject flag: CreateFlagCommand.flags) {
+            flag.nearbyPlayers.remove(e.getEntity().getPlayer());
         }
     }
 }
