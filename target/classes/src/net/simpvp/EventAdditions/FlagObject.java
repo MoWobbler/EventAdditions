@@ -159,7 +159,7 @@ public class FlagObject {
 
     /* Compare two locations to see if a player is near the flag */
     public boolean isPlayerNear(Location location) {
-        return location.distance(startingBlock.getLocation()) <= 5;
+        return location.distance(startingBlock.getLocation()) <= 4;
     }
 
 
