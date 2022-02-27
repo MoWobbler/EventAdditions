@@ -15,5 +15,4 @@ public class EventAdditions extends JavaPlugin {
         getCommand("timer").setExecutor(new TimerCommand());
         getCommand("stoptimers").setExecutor(new TimerCommand());
     }
-
 }

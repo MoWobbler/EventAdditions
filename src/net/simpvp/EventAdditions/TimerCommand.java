@@ -15,6 +15,8 @@ public class TimerCommand implements CommandExecutor {
     Location location;
     BlockCommandSender cmdBlock;
 
+    int xCoord, yCoord, zCoord;
+
     public static ArrayList<Timer> timers = new ArrayList<>();
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -28,8 +30,8 @@ public class TimerCommand implements CommandExecutor {
             cmdBlock = (BlockCommandSender) sender;
             location = cmdBlock.getBlock().getLocation();
 
-            if (args.length != 1) {
-                cmdBlock.sendMessage("/timer <seconds>");
+            if (args.length != 4) {
+                cmdBlock.sendMessage("/timer <seconds> <x> <y> <z> (coords are relative)");
                 return true;
             }
 
@@ -51,11 +53,17 @@ public class TimerCommand implements CommandExecutor {
                     cmdBlock.sendMessage("Timer can't be longer than 600 seconds");
                     return true;
                 }
-                Timer timer = new Timer(cmdBlock.getBlock().getLocation(), seconds);
+
+                xCoord = Integer.parseInt(args[1]);
+                yCoord = Integer.parseInt(args[2]);
+                zCoord = Integer.parseInt(args[3]);
+
+
+                Timer timer = new Timer(cmdBlock.getBlock().getLocation(), seconds, xCoord, yCoord, zCoord);
                 timers.add(timer);
                 cmdBlock.sendMessage("Starting " + seconds + " second timer");
             } catch (Exception e) {
-                cmdBlock.sendMessage("/timer <seconds>");
+                cmdBlock.sendMessage("/timer <seconds> <~x> <~y> <~z> (coords are relative)");
                 return true;
             }
         }
@@ -81,6 +89,7 @@ public class TimerCommand implements CommandExecutor {
 
         return true;
     }
+
 
 
 
