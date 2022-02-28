@@ -37,6 +37,13 @@ public class CreateFlagCommand implements CommandExecutor {
             return true;
         }
 
+        BlockCommandSender cmdBlock = (BlockCommandSender) sender;
+
+        if (!EventAdditions.listOfWorlds.contains(cmdBlock.getBlock().getWorld().getName())) {
+            cmdBlock.sendMessage(ChatColor.RED + "This world does not have EventAdditions enabled");
+            return true;
+        }
+
         isXDefined = false;
         isYDefined = false;
         isZDefined = false;
@@ -44,7 +51,6 @@ public class CreateFlagCommand implements CommandExecutor {
         isOutputDefined = false;
         isNameDefined = false;
 
-        BlockCommandSender cmdBlock = (BlockCommandSender) sender;
         startingLocation = cmdBlock.getBlock().getLocation();
 
         for (String arg : args) {

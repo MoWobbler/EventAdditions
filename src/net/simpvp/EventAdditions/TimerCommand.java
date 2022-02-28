@@ -28,6 +28,12 @@ public class TimerCommand implements CommandExecutor {
             }
 
             cmdBlock = (BlockCommandSender) sender;
+
+            if (!EventAdditions.listOfWorlds.contains(cmdBlock.getBlock().getWorld().getName())) {
+                cmdBlock.sendMessage(ChatColor.RED + "This world does not have EventAdditions enabled");
+                return true;
+            }
+
             location = cmdBlock.getBlock().getLocation();
 
             if (args.length != 4) {
