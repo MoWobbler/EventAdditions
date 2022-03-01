@@ -240,6 +240,9 @@ public class FlagObject {
     /* Message everyone who is near this flag*/
     public void messageNearbyPlayers(String message) {
         for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+            if (!(player.getWorld().equals(startingBlock.getWorld()))) {
+                return;
+            }
             if (player.getLocation().distance(startingBlock.getLocation()) < 1000) {
                 player.sendMessage(flagTeam.getColor() + message);
             }
