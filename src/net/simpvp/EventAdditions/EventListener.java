@@ -1,6 +1,7 @@
 package net.simpvp.EventAdditions;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -50,6 +51,10 @@ public class EventListener implements Listener {
     public void onBlockBreak(BlockBreakEvent e) {
 
         if (!EventAdditions.listOfWorlds.contains(e.getPlayer().getWorld().getName())) {
+            return;
+        }
+
+        if (!e.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
 
