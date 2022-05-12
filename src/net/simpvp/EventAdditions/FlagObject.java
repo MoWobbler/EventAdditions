@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class FlagObject {
 
-    private String flagName;
+    private final String flagName;
 
     private final BlockCommandSender cmdBlock;
     private final Team flagTeam;
@@ -32,6 +32,9 @@ public class FlagObject {
     private boolean isCaptured = false;
     private boolean isFlagInitialized = false;
     private boolean isTaskActive = false;
+
+    private int totalFlagpoleLength;
+    private int captureProgress = 0;
 
     public FlagObject(Block startingBlock, Team flagTeam, BlockCommandSender cmdBlock, boolean redstoneOutput, String flagName) {
        this.startingBlock = startingBlock;
@@ -95,6 +98,7 @@ public class FlagObject {
             flagPole = flagPole.getRelative(BlockFace.UP);
         }
         topOfFlagPole = flagPole;
+        totalFlagpoleLength = topOfFlagPole.getY() - topOfFlagPoleBase.getY() - 2;
         return true;
     }
 
@@ -135,6 +139,7 @@ public class FlagObject {
 
     /* Move flag down one */
     public void moveFlagDown() {
+        captureProgress += 1;
         if (flagName != null) {
             messageNearbyPlayers("The " + flagName + " is being captured!");
         }
@@ -244,7 +249,8 @@ public class FlagObject {
                 continue;
             }
             if (player.getLocation().distance(startingBlock.getLocation()) < 1000) {
-                player.sendMessage(flagTeam.getColor() + message);
+                player.sendMessage(flagTeam.getColor() + message
+                        + " (" + captureProgress + "/" + totalFlagpoleLength + ")");
             }
         }
     }
