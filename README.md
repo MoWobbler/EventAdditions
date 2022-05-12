@@ -11,4 +11,4 @@ Use maven
 ```
 mvn clean package
 ```
-and the built .jar will be in `target/AntiAfk.jar`.
+and the built .jar will be in `target/EventAdditions.jar`.
