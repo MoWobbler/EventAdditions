@@ -1,9 +1,14 @@
 package net.simpvp.EventAdditions;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Timer {
 
@@ -13,15 +18,22 @@ public class Timer {
     BukkitTask bukkitTask1;
     BukkitTask bukkitTask2;
 
+    public ArrayList<Player> nearbyPlayers = new ArrayList<>();
+
     int x, z, y;
 
+    boolean visual;
 
-    public Timer(Location timerLocation, int seconds, int x, int y, int z) {
+
+    public Timer(Location timerLocation, int seconds, int x, int y, int z, boolean visual) {
         this.timerLocation = timerLocation;
         this.seconds = seconds;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.visual = visual;
+        getNearbyPlayers();
+
         startTimer();
     }
 
@@ -35,6 +47,9 @@ public class Timer {
             @Override
             public void run() {
                 if (System.currentTimeMillis() < activate_at) {
+                    if (visual) {
+                        xpBarTimer((float) (((activate_at - System.currentTimeMillis())) / seconds) / 1000);
+                    }
                     return;
                 }
 
@@ -42,12 +57,13 @@ public class Timer {
                 bukkitTask2 = new BukkitRunnable() {
                     @Override
                     public void run() {
+                        xpBarTimer(0);
                         placeRedstoneOutput();
                         removeObject();
                     }
                 }.runTaskLater(EventAdditions.instance, 0);
             }
-        }.runTaskTimerAsynchronously(EventAdditions.instance, 20L, 20L);
+        }.runTaskTimerAsynchronously(EventAdditions.instance, 1L, 1L);
     }
 
 
@@ -78,4 +94,27 @@ public class Timer {
             bukkitTask2.cancel();
         }
     }
+
+
+    public void getNearbyPlayers() {
+        for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+            if (!(player.getWorld().equals(timerLocation.getWorld()))) {
+                continue;
+            }
+            if (player.getLocation().distance(timerLocation) < 1000) {
+                nearbyPlayers.add(player);
+            }
+        }
+    }
+
+    public void xpBarTimer(float level) {
+        for (Player player: nearbyPlayers) {
+            player.setExp(level);
+        }
+    }
+
+    public boolean isVisual() {
+        return visual;
+    }
+
 }

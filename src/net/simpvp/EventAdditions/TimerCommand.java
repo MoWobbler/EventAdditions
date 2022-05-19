@@ -16,6 +16,7 @@ public class TimerCommand implements CommandExecutor {
     BlockCommandSender cmdBlock;
 
     int xCoord, yCoord, zCoord;
+    boolean visual = false;
 
     public static ArrayList<Timer> timers = new ArrayList<>();
 
@@ -34,11 +35,17 @@ public class TimerCommand implements CommandExecutor {
                 return true;
             }
 
+            visual = false;
+
             location = cmdBlock.getBlock().getLocation();
 
-            if (args.length != 4) {
-                cmdBlock.sendMessage("/timer <seconds> <x> <y> <z> (coords are relative)");
+            if (args.length != 4 && args.length != 5) {
+                cmdBlock.sendMessage("/timer <seconds> <x> <y> <z> <boolean>");
                 return true;
+            }
+
+            if (args.length == 5 && args[4].equalsIgnoreCase("true")) {
+                visual = true;
             }
 
             if (timers.size() >= 5) {
@@ -47,6 +54,11 @@ public class TimerCommand implements CommandExecutor {
             }
 
             for (Timer t: timers) {
+                if (t.isVisual()) {
+                    cmdBlock.sendMessage("Only one visual timer can run at a time");
+                    return true;
+                }
+
                 if (t.getTimerLocation().equals(location)) {
                     cmdBlock.sendMessage("There is already a timer running at this location");
                     return true;
@@ -65,7 +77,7 @@ public class TimerCommand implements CommandExecutor {
                 zCoord = Integer.parseInt(args[3]);
 
 
-                Timer timer = new Timer(cmdBlock.getBlock().getLocation(), seconds, xCoord, yCoord, zCoord);
+                Timer timer = new Timer(cmdBlock.getBlock().getLocation(), seconds, xCoord, yCoord, zCoord, visual);
                 timers.add(timer);
                 cmdBlock.sendMessage("Starting " + seconds + " second timer");
             } catch (Exception e) {
