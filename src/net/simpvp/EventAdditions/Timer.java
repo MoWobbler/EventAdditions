@@ -8,7 +8,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Timer {
 
@@ -115,6 +114,10 @@ public class Timer {
 
     public boolean isVisual() {
         return visual;
+    }
+
+    public void removeNearbyPlayer(Player player) {
+        nearbyPlayers.remove(player);
     }
 
 }

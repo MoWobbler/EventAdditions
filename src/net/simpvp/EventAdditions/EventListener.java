@@ -94,5 +94,11 @@ public class EventListener implements Listener {
         for (FlagObject flag: CreateFlagCommand.flags) {
             flag.nearbyPlayers.remove(e.getEntity().getPlayer());
         }
+
+        for (Timer timer: TimerCommand.timers) {
+            timer.nearbyPlayers.remove(e.getEntity().getPlayer());
+        }
+
+
     }
 }
