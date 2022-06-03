@@ -117,8 +117,13 @@ public class TagMinigame implements CommandExecutor {
     /* Alert all nearby players with a string and a sound */
     public static void messageNearbyPlayers(String string) {
         for (Player p: Bukkit.getOnlinePlayers()) {
+
+            if (!p.getWorld().equals(cmdBlock.getBlock().getWorld())) {
+                continue;
+            }
+
             if (p.getLocation().distance(cmdBlock.getBlock().getLocation()) <= 1000) {
-                p.sendMessage(ChatColor.DARK_RED + string);
+                p.sendMessage(ChatColor.YELLOW + string);
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 10, 2);
             }
         }

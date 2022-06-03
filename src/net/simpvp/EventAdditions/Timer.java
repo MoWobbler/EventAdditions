@@ -100,7 +100,7 @@ public class Timer {
             if (!(player.getWorld().equals(timerLocation.getWorld()))) {
                 continue;
             }
-            if (player.getLocation().distance(timerLocation) < 1000) {
+            if (player.getLocation().distance(timerLocation) < 1000 && !player.isDead()) {
                 nearbyPlayers.add(player);
             }
         }
