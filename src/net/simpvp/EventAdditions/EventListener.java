@@ -3,12 +3,16 @@ package net.simpvp.EventAdditions;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Objects;
@@ -99,6 +103,53 @@ public class EventListener implements Listener {
             timer.nearbyPlayers.remove(e.getEntity().getPlayer());
         }
 
+        Player p = e.getEntity().getPlayer();
+        if (TagMinigame.isPlayerTagged(p)) {
+            p.removePotionEffect(PotionEffectType.SPEED);
+            p.removePotionEffect(PotionEffectType.GLOWING);
+            e.setDeathMessage(p.getDisplayName() + " was killed for being it");
 
+        }
+    }
+
+
+    @EventHandler
+    public void playerHit(EntityDamageByEntityEvent e) {
+
+        if (!EventAdditions.listOfWorlds.contains(e.getEntity().getWorld().getName())) {
+            return;
+        }
+
+        if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
+            Player playerWhoGotHit = (Player) e.getEntity();
+            Player playerWhoHit = (Player) e.getDamager();
+            if (TagMinigame.isPlayerTagged(playerWhoHit) && !TagMinigame.isPlayerTagged(playerWhoGotHit)) {
+                TagMinigame.untagPlayer(playerWhoHit);
+                TagMinigame.tagPlayer(playerWhoGotHit, playerWhoGotHit.getDisplayName() + " has been tagged by " + playerWhoHit.getDisplayName());
+            }
+        }
+    }
+
+    @EventHandler
+    public void logOut(PlayerQuitEvent e) {
+        if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
+            return;
+        }
+
+        for (FlagObject flag: CreateFlagCommand.flags) {
+            flag.nearbyPlayers.remove(e.getPlayer());
+        }
+
+        for (Timer timer: TimerCommand.timers) {
+            timer.nearbyPlayers.remove(e.getPlayer());
+        }
+
+        Player p = e.getPlayer();
+        if (TagMinigame.isPlayerTagged(p)) {
+            p.removePotionEffect(PotionEffectType.SPEED);
+            p.removePotionEffect(PotionEffectType.GLOWING);
+            TagMinigame.taggedPlayers.remove(p);
+            TagMinigame.nearbyTaggablePlayers.add(p);
+        }
     }
 }

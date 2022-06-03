@@ -13,3 +13,5 @@ commands:
     description: start a timer
   stoptimers:
     description: stop all timer
+  tagevent:
+    description: tag and untag players in a minigame

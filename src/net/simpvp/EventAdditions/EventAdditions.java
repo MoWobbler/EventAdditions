@@ -22,5 +22,6 @@ public class EventAdditions extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         getCommand("timer").setExecutor(new TimerCommand());
         getCommand("stoptimers").setExecutor(new TimerCommand());
+        getCommand("tagevent").setExecutor(new TagMinigame());
     }
 }
