@@ -80,7 +80,6 @@ public class TagMinigame implements CommandExecutor {
     /* Kill all players who are "it" */
     public void killTaggedPlayers() {
         for (Player p: taggedPlayers) {
-            EventAdditions.instance.getLogger().info(p.getDisplayName());
             p.removePotionEffect(PotionEffectType.SPEED);
             p.removePotionEffect(PotionEffectType.GLOWING);
             p.setHealth(0.0);
@@ -109,7 +108,9 @@ public class TagMinigame implements CommandExecutor {
             }
 
             if (p.getLocation().distance(cmdBlock.getBlock().getLocation()) <= 500 && (p.getGameMode().equals(GameMode.SURVIVAL) || p.getGameMode().equals(GameMode.ADVENTURE))) {
-                nearbyTaggablePlayers.add(p);
+                if (p.getScoreboard().getPlayerTeam(p) != null) {
+                    nearbyTaggablePlayers.add(p);
+                }
             }
         }
     }

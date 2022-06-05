@@ -108,7 +108,7 @@ public class EventListener implements Listener {
             p.removePotionEffect(PotionEffectType.SPEED);
             p.removePotionEffect(PotionEffectType.GLOWING);
             e.setDeathMessage(p.getDisplayName() + " was killed for being it");
-
+            TagMinigame.taggedPlayers.remove(p);
         }
     }
 
@@ -149,7 +149,6 @@ public class EventListener implements Listener {
             p.removePotionEffect(PotionEffectType.SPEED);
             p.removePotionEffect(PotionEffectType.GLOWING);
             TagMinigame.taggedPlayers.remove(p);
-            TagMinigame.nearbyTaggablePlayers.add(p);
         }
     }
 }
