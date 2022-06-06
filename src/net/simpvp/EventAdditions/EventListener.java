@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -128,6 +129,12 @@ public class EventListener implements Listener {
                 TagMinigame.tagPlayer(playerWhoGotHit, playerWhoGotHit.getDisplayName() + " has been tagged by " + playerWhoHit.getDisplayName());
             }
         }
+
+
+        if (e.getDamager() instanceof Snowball && SnowballDamageCommand.isSnowballNear(e.getEntity())) {
+            e.setDamage(5);
+        }
+
     }
 
     @EventHandler
