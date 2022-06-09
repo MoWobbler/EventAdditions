@@ -56,7 +56,9 @@ public class Timer {
                 bukkitTask2 = new BukkitRunnable() {
                     @Override
                     public void run() {
-                        xpBarTimer(0);
+                        if (visual) {
+                            xpBarTimer(0);
+                        }
                         placeRedstoneOutput();
                         removeObject();
                     }
