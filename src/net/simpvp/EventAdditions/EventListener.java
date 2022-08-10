@@ -1,9 +1,6 @@
 package net.simpvp.EventAdditions;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -186,6 +183,7 @@ public class EventListener implements Listener {
 
         if (e.getDamager() instanceof Snowball && snowballIds.contains(e.getDamager().getUniqueId())) {
             e.setDamage(5);
+            playSoundEffect(e.getDamager().getLocation(), Sound.ENTITY_WITHER_SHOOT, (float) .3,2);
             snowballIds.remove(e.getDamager().getUniqueId());
         }
 
@@ -220,7 +218,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void projectileThrow(PlayerInteractEvent e) {
-        if (e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+        if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getItem() == null) return;
             if (e.getItem().getType().equals(Material.SPLASH_POTION) || e.getItem().getType().equals(Material.LINGERING_POTION)) {
 
@@ -232,6 +230,7 @@ public class EventListener implements Listener {
                 ThrownPotion thrownPotion = (ThrownPotion) e.getPlayer().getWorld().spawnEntity(location, EntityType.SPLASH_POTION);
                 thrownPotion.setItem(e.getItem());
                 thrownPotion.setVelocity((e.getPlayer().getLocation()).getDirection());
+                playSoundEffect(e.getPlayer().getLocation(), Sound.ENTITY_SPLASH_POTION_THROW, 10, .1f);
 
                 e.getItem().setAmount(e.getItem().getAmount() - 1);
                 e.setCancelled(true);
@@ -246,6 +245,7 @@ public class EventListener implements Listener {
                 snowball.setItem(e.getItem());
                 snowball.setVelocity((e.getPlayer().getLocation()).getDirection());
                 snowballIds.add(snowball.getUniqueId());
+                playSoundEffect(e.getPlayer().getLocation(), Sound.ENTITY_SPLASH_POTION_THROW, .7f,  .1f);
 
                 e.getItem().setAmount(e.getItem().getAmount() - 1);
                 e.setCancelled(true);
@@ -263,5 +263,9 @@ public class EventListener implements Listener {
             }
         }
         return false;
+    }
+
+    public void playSoundEffect(Location location, Sound sound, float volume, float pitch) {
+        Objects.requireNonNull(location.getWorld()).playSound(location, sound, volume , pitch);
     }
 }
