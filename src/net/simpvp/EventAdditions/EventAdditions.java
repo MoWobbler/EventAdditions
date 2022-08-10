@@ -23,6 +23,7 @@ public class EventAdditions extends JavaPlugin {
         getCommand("timer").setExecutor(new TimerCommand());
         getCommand("stoptimers").setExecutor(new TimerCommand());
         getCommand("tagevent").setExecutor(new TagMinigame());
-        getCommand("snowballdamage").setExecutor(new SnowballDamageCommand());
+        getCommand("createobjective").setExecutor(new CreateObjectiveCommand());
+        getCommand("deleteobjectives").setExecutor(new DeleteObjectivesCommand());
     }
 }

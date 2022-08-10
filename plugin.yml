@@ -15,5 +15,7 @@ commands:
     description: stop all timer
   tagevent:
     description: tag and untag players in a minigame
-  snowballdamage:
-    description: give snowballs damage
+  createobjective:
+    description: create an objective
+  deleteobjectives:
+    description: delete all objectives

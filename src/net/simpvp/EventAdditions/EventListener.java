@@ -2,24 +2,35 @@ package net.simpvp.EventAdditions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class EventListener implements Listener {
 
+    ArrayList<UUID> snowballIds = new ArrayList<>();
 
     /* Test for players near a flag */
     @EventHandler
@@ -29,24 +40,61 @@ public class EventListener implements Listener {
             return;
         }
 
-        if (CreateFlagCommand.flags.isEmpty()) return;
-        Team team = e.getPlayer().getScoreboard().getPlayerTeam(e.getPlayer());
+        if (!CreateFlagCommand.flags.isEmpty()) {
+            Team team = e.getPlayer().getScoreboard().getPlayerTeam(e.getPlayer());
 
-        for (FlagObject flag: CreateFlagCommand.flags) {
-            if (flag.getIsCaptured()) continue;
-            if (flag.getTeam().equals(team)) continue;
-            if (flag.isPlayerNear(e.getPlayer().getLocation()) && !flag.getIsTaskActive()) {
-                flag.nearbyPlayers.add(e.getPlayer());
-                flag.startTimerTask();
-                return;
+            for (FlagObject flag: CreateFlagCommand.flags) {
+                if (flag.getIsCaptured()) continue;
+                if (flag.getTeam().equals(team)) continue;
+                if (flag.isPlayerNear(e.getPlayer().getLocation()) && !flag.getIsTaskActive()) {
+                    flag.nearbyPlayers.add(e.getPlayer());
+                    flag.startTimerTask();
+                    continue;
+                }
+
+                if (!flag.isPlayerNear(e.getPlayer().getLocation())) {
+                    flag.nearbyPlayers.remove(e.getPlayer());
+                }
+
+                if (!flag.isPlayerNear(e.getPlayer().getLocation()) && flag.getIsTaskActive() && flag.nearbyPlayers.isEmpty()) {
+                    flag.cancelTimerTask();
+                }
             }
+        }
 
-            if (!flag.isPlayerNear(e.getPlayer().getLocation())) {
-                flag.nearbyPlayers.remove(e.getPlayer());
-            }
+        if (!CreateObjectiveCommand.objectives.isEmpty()) {
+            Team team = e.getPlayer().getScoreboard().getPlayerTeam(e.getPlayer());
+            for (ObjectiveObject objective: CreateObjectiveCommand.objectives) {
+                boolean isInside = objective.isLocationInsideRegion(e.getPlayer().getLocation());
 
-            if (!flag.isPlayerNear(e.getPlayer().getLocation()) && flag.getIsTaskActive() && flag.nearbyPlayers.isEmpty()) {
-                flag.cancelTimerTask();
+                if (objective.getObjectiveTeam().equals(team) && isInside) {
+                    if (objective.teammatesAtObjective.contains(e.getPlayer())) continue;
+                    objective.teammatesAtObjective.add(e.getPlayer());
+                }
+                if (!objective.getObjectiveTeam().equals(team) && isInside) {
+                    if (objective.enemiesAtObjective.contains(e.getPlayer())) continue;
+                    objective.enemiesAtObjective.add(e.getPlayer());
+                }
+
+                if (!isInside) {
+                    objective.teammatesAtObjective.remove(e.getPlayer());
+                    objective.enemiesAtObjective.remove(e.getPlayer());
+                }
+
+                if (objective.teammatesAtObjective.isEmpty() && !objective.enemiesAtObjective.isEmpty() && !objective.getIsTaskActive() && !objective.hasBeenCaptured()) {
+                    objective.startTimer();
+                    continue;
+                }
+                if (!isInside && objective.enemiesAtObjective.isEmpty() && objective.getIsTaskActive()) {
+                    objective.stopTimer();
+                    objective.messageNearbyPlayers("Attackers have been forced out of the objective", ChatColor.BLUE);
+                    continue;
+                }
+
+                if (!objective.teammatesAtObjective.isEmpty() && objective.getIsTaskActive()) {
+                    objective.stopTimer();
+                    objective.messageNearbyPlayers("Attackers have been pushed out of the objective", ChatColor.BLUE);
+                }
             }
         }
     }
@@ -100,6 +148,11 @@ public class EventListener implements Listener {
             flag.nearbyPlayers.remove(e.getEntity().getPlayer());
         }
 
+        for (ObjectiveObject obj: CreateObjectiveCommand.objectives) {
+            obj.enemiesAtObjective.remove(e.getEntity().getPlayer());
+            obj.teammatesAtObjective.remove(e.getEntity().getPlayer());
+        }
+
         for (Timer timer: TimerCommand.timers) {
             timer.nearbyPlayers.remove(e.getEntity().getPlayer());
         }
@@ -131,8 +184,9 @@ public class EventListener implements Listener {
         }
 
 
-        if (e.getDamager() instanceof Snowball && SnowballDamageCommand.isSnowballNear(e.getEntity())) {
+        if (e.getDamager() instanceof Snowball && snowballIds.contains(e.getDamager().getUniqueId())) {
             e.setDamage(5);
+            snowballIds.remove(e.getDamager().getUniqueId());
         }
 
     }
@@ -147,6 +201,11 @@ public class EventListener implements Listener {
             flag.nearbyPlayers.remove(e.getPlayer());
         }
 
+        for (ObjectiveObject obj: CreateObjectiveCommand.objectives) {
+            obj.enemiesAtObjective.remove(e.getPlayer());
+            obj.teammatesAtObjective.remove(e.getPlayer());
+        }
+
         for (Timer timer: TimerCommand.timers) {
             timer.nearbyPlayers.remove(e.getPlayer());
         }
@@ -157,5 +216,58 @@ public class EventListener implements Listener {
             p.removePotionEffect(PotionEffectType.GLOWING);
             TagMinigame.taggedPlayers.remove(p);
         }
+    }
+
+    @EventHandler
+    public void projectileThrow(PlayerInteractEvent e) {
+        if (e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+            if (e.getItem() == null) return;
+            if (e.getItem().getType().equals(Material.SPLASH_POTION) || e.getItem().getType().equals(Material.LINGERING_POTION)) {
+
+
+                if (!hasCorrectItemLore(e.getItem(), "Throws Farther")) return;
+
+                Location location = e.getPlayer().getLocation();
+                location.setY(location.getY() + 1.5);
+                ThrownPotion thrownPotion = (ThrownPotion) e.getPlayer().getWorld().spawnEntity(location, EntityType.SPLASH_POTION);
+                thrownPotion.setItem(e.getItem());
+                thrownPotion.setVelocity((e.getPlayer().getLocation()).getDirection());
+
+                e.getItem().setType(Material.AIR);
+
+                e.setCancelled(true);
+
+            }
+
+            if (e.getItem().getType().equals(Material.SNOWBALL)) {
+                if (!hasCorrectItemLore(e.getItem(), "Damaging Snowball")) return;
+                Location location = e.getPlayer().getLocation();
+                location.setY(location.getY() + 1.5);
+
+                Snowball snowball = (Snowball) e.getPlayer().getWorld().spawnEntity(location, EntityType.SNOWBALL);
+                snowball.setItem(e.getItem());
+                snowball.setVelocity((e.getPlayer().getLocation()).getDirection());
+                snowballIds.add(snowball.getUniqueId());
+
+                e.getItem().setType(Material.AIR);
+
+                e.setCancelled(true);
+
+            }
+
+        }
+    }
+
+
+    public boolean hasCorrectItemLore(ItemStack item, String lore) {
+        List<String> stringList = Objects.requireNonNull(item.getItemMeta()).getLore();
+
+        if (stringList == null) return false;
+        for (String element: stringList) {
+            if (element.startsWith(lore)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

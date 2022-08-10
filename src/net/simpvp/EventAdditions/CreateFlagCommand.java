@@ -137,7 +137,7 @@ public class CreateFlagCommand implements CommandExecutor {
 
         for (FlagObject f: flags) {
             if (f.getStartBlock().equals(finalLocation.getBlock())) {
-                cmdBlock.sendMessage("Failed to place flag. A flag already exists");
+                cmdBlock.sendMessage("Failed to place flag. A flag already exists there");
                 return true;
             }
         }
