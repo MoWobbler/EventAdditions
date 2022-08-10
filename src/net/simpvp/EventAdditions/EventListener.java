@@ -233,10 +233,8 @@ public class EventListener implements Listener {
                 thrownPotion.setItem(e.getItem());
                 thrownPotion.setVelocity((e.getPlayer().getLocation()).getDirection());
 
-                e.getItem().setType(Material.AIR);
-
+                e.getItem().setAmount(e.getItem().getAmount() - 1);
                 e.setCancelled(true);
-
             }
 
             if (e.getItem().getType().equals(Material.SNOWBALL)) {
@@ -249,15 +247,11 @@ public class EventListener implements Listener {
                 snowball.setVelocity((e.getPlayer().getLocation()).getDirection());
                 snowballIds.add(snowball.getUniqueId());
 
-                e.getItem().setType(Material.AIR);
-
+                e.getItem().setAmount(e.getItem().getAmount() - 1);
                 e.setCancelled(true);
-
             }
-
         }
     }
-
 
     public boolean hasCorrectItemLore(ItemStack item, String lore) {
         List<String> stringList = Objects.requireNonNull(item.getItemMeta()).getLore();
