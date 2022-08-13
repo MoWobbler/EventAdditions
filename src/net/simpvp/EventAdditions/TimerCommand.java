@@ -54,7 +54,7 @@ public class TimerCommand implements CommandExecutor {
             }
 
             for (Timer t: timers) {
-                if (t.isVisual()) {
+                if (t.isVisual() && visual) {
                     cmdBlock.sendMessage("Only one visual timer can run at a time");
                     return true;
                 }

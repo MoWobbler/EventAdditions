@@ -5,20 +5,20 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
-import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +90,7 @@ public class EventListener implements Listener {
 
                 if (!objective.teammatesAtObjective.isEmpty() && objective.getIsTaskActive()) {
                     objective.stopTimer();
-                    objective.messageNearbyPlayers("Attackers have been pushed out of the objective", ChatColor.BLUE);
+                    objective.messageNearbyPlayers("The objective is being contested!", ChatColor.BLUE);
                 }
             }
         }
@@ -148,6 +148,13 @@ public class EventListener implements Listener {
         for (ObjectiveObject obj: CreateObjectiveCommand.objectives) {
             obj.enemiesAtObjective.remove(e.getEntity().getPlayer());
             obj.teammatesAtObjective.remove(e.getEntity().getPlayer());
+            if (obj.enemiesAtObjective.isEmpty() && obj.getIsTaskActive()) {
+                obj.stopTimer();
+                obj.messageNearbyPlayers("Attackers have been pushed out of the objective", ChatColor.BLUE);
+            }
+            if (!obj.enemiesAtObjective.isEmpty() && obj.teammatesAtObjective.isEmpty() && !obj.getIsTaskActive()) {
+                obj.startTimer();
+            }
         }
 
         for (Timer timer: TimerCommand.timers) {
@@ -166,7 +173,6 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void playerHit(EntityDamageByEntityEvent e) {
-
         if (!EventAdditions.listOfWorlds.contains(e.getEntity().getWorld().getName())) {
             return;
         }
@@ -190,6 +196,27 @@ public class EventListener implements Listener {
     }
 
     @EventHandler
+    public void playerTeleport(PlayerTeleportEvent e) {
+        if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
+            return;
+        }
+
+        for (FlagObject flag: CreateFlagCommand.flags) {
+            flag.nearbyPlayers.remove(e.getPlayer());
+        }
+
+        for (ObjectiveObject obj: CreateObjectiveCommand.objectives) {
+            obj.enemiesAtObjective.remove(e.getPlayer());
+            obj.teammatesAtObjective.remove(e.getPlayer());
+            if (obj.enemiesAtObjective.isEmpty() && obj.getIsTaskActive()) {
+                obj.stopTimer();
+                obj.messageNearbyPlayers("Attackers have been pushed out of the objective", ChatColor.BLUE);
+            }
+        }
+
+    }
+
+    @EventHandler
     public void logOut(PlayerQuitEvent e) {
         if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
             return;
@@ -202,6 +229,13 @@ public class EventListener implements Listener {
         for (ObjectiveObject obj: CreateObjectiveCommand.objectives) {
             obj.enemiesAtObjective.remove(e.getPlayer());
             obj.teammatesAtObjective.remove(e.getPlayer());
+            if (obj.enemiesAtObjective.isEmpty() && obj.getIsTaskActive()) {
+                obj.stopTimer();
+                obj.messageNearbyPlayers("Attackers have been pushed out of the objective", ChatColor.BLUE);
+            }
+            if (obj.teammatesAtObjective.isEmpty() && !obj.getIsTaskActive()) {
+                obj.startTimer();
+            }
         }
 
         for (Timer timer: TimerCommand.timers) {
@@ -218,37 +252,118 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void projectileThrow(PlayerInteractEvent e) {
+        if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
+            return;
+        }
+
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getItem() == null) return;
             if (e.getItem().getType().equals(Material.SPLASH_POTION) || e.getItem().getType().equals(Material.LINGERING_POTION)) {
 
+                boolean throwFarther = hasCorrectItemLore(e.getItem(), "Throws Farther");
+                boolean flaming = hasCorrectItemLore(e.getItem(), "Flaming");
+                boolean smoking = hasCorrectItemLore(e.getItem(), "Smoking");
 
-                if (!hasCorrectItemLore(e.getItem(), "Throws Farther")) return;
+                if (!flaming && !throwFarther && !smoking) {
+                    return;
+                }
 
-                Location location = e.getPlayer().getLocation();
-                location.setY(location.getY() + 1.5);
-                ThrownPotion thrownPotion = (ThrownPotion) e.getPlayer().getWorld().spawnEntity(location, EntityType.SPLASH_POTION);
-                thrownPotion.setItem(e.getItem());
-                thrownPotion.setVelocity((e.getPlayer().getLocation()).getDirection());
-                playSoundEffect(e.getPlayer().getLocation(), Sound.ENTITY_SPLASH_POTION_THROW, 10, .1f);
-
+                Player player = e.getPlayer();
+                new SplashPotion(player, flaming, smoking, throwFarther, e.getItem());
                 e.getItem().setAmount(e.getItem().getAmount() - 1);
                 e.setCancelled(true);
             }
 
             if (e.getItem().getType().equals(Material.SNOWBALL)) {
-                if (!hasCorrectItemLore(e.getItem(), "Damaging Snowball")) return;
-                Location location = e.getPlayer().getLocation();
-                location.setY(location.getY() + 1.5);
+                if (hasCorrectItemLore(e.getItem(), "Damaging Snowball")) {
+                    Location location = e.getPlayer().getLocation();
+                    location.setY(location.getY() + 1.5);
 
-                Snowball snowball = (Snowball) e.getPlayer().getWorld().spawnEntity(location, EntityType.SNOWBALL);
-                snowball.setItem(e.getItem());
-                snowball.setVelocity((e.getPlayer().getLocation()).getDirection());
-                snowballIds.add(snowball.getUniqueId());
-                playSoundEffect(e.getPlayer().getLocation(), Sound.ENTITY_SPLASH_POTION_THROW, .7f,  .1f);
+                    Snowball snowball = (Snowball) e.getPlayer().getWorld().spawnEntity(location, EntityType.SNOWBALL);
+                    snowball.setItem(e.getItem());
+                    snowball.setVelocity((e.getPlayer().getLocation()).getDirection());
+                    snowballIds.add(snowball.getUniqueId());
+                    playSoundEffect(e.getPlayer().getLocation(), Sound.ENTITY_SPLASH_POTION_THROW, .7f, .1f);
 
-                e.getItem().setAmount(e.getItem().getAmount() - 1);
-                e.setCancelled(true);
+                    e.getItem().setAmount(e.getItem().getAmount() - 1);
+                    e.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void potionBreak(PotionSplashEvent e) {
+        if (SplashPotion.containsFlamingUUID(e.getEntity().getUniqueId())) {
+            SplashPotion.removeFlamingUUID(e.getEntity().getUniqueId());
+            Block centerBlock = e.getEntity().getLocation().getBlock();
+            ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 2);
+            for (Block block: blocksInRadius) {
+                if (block.getType() != Material.AIR) continue;
+                block.setType(Material.FIRE);
+            }
+        }
+
+        if (SplashPotion.containsSmokingUUID(e.getEntity().getUniqueId())) {
+            SplashPotion.removeSmokingUUID(e.getEntity().getUniqueId());
+            Block centerBlock = e.getEntity().getLocation().getBlock();
+
+            if (e.getEntity().getLocation().getWorld() != null) {
+                Location entityLocation = e.getEntity().getLocation();
+                Location loc = centerBlock.getLocation();
+                ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 2);
+
+                new BukkitRunnable() {
+                    private int i = 0;
+                    @Override
+                    public void run() {
+                        if(i >= 5) {
+                            cancel();
+                        }
+                        ++i;
+                        spawnSmoke(blocksInRadius, loc, entityLocation);
+                        playSoundEffect(loc, Sound.BLOCK_FIRE_EXTINGUISH, .8F, .1F);
+
+                    }
+                }.runTaskTimer(EventAdditions.instance, 0, 40L);
+            }
+        }
+    }
+
+    @EventHandler
+    public void lingeringPotionBreak(LingeringPotionSplashEvent e) {
+        if (SplashPotion.containsFlamingUUID(e.getEntity().getUniqueId())) {
+            SplashPotion.removeFlamingUUID(e.getEntity().getUniqueId());
+            Block centerBlock = e.getEntity().getLocation().getBlock();
+            ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 2);
+            for (Block block: blocksInRadius) {
+                if (block.getType() != Material.AIR) continue;
+                block.setType(Material.FIRE);
+            }
+        }
+
+        if (SplashPotion.containsSmokingUUID(e.getEntity().getUniqueId())) {
+            SplashPotion.removeSmokingUUID(e.getEntity().getUniqueId());
+            Block centerBlock = e.getEntity().getLocation().getBlock();
+
+            if (e.getEntity().getLocation().getWorld() != null) {
+                Location entityLocation = e.getEntity().getLocation();
+                Location loc = centerBlock.getLocation();
+                ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 2);
+
+                new BukkitRunnable() {
+                    private int i = 0;
+                    @Override
+                    public void run() {
+                        if(i >= 5) {
+                            cancel();
+                        }
+                        ++i;
+                        spawnSmoke(blocksInRadius, loc, entityLocation);
+                        playSoundEffect(loc, Sound.BLOCK_FIRE_EXTINGUISH, .8F, .1F);
+
+                    }
+                }.runTaskTimer(EventAdditions.instance, 0, 40L);
             }
         }
     }
@@ -268,4 +383,29 @@ public class EventListener implements Listener {
     public void playSoundEffect(Location location, Sound sound, float volume, float pitch) {
         Objects.requireNonNull(location.getWorld()).playSound(location, sound, volume , pitch);
     }
+
+    public ArrayList<Block> getBlocksInRadius(Block start, int radius){
+        ArrayList<Block> blocks = new ArrayList<>();
+        for(double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++){
+            for(double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++){
+                for(double z = start.getLocation().getZ() - radius; z <= start.getLocation().getZ() + radius; z++){
+                    Location loc = new Location(start.getWorld(), x, y, z);
+                    blocks.add(loc.getBlock());
+                }
+            }
+        }
+        return blocks;
+    }
+
+
+    public void spawnSmoke(ArrayList<Block> blocksInRadius, Location loc, Location entityLocation) {
+        for (Block block : blocksInRadius) {
+            if (block.getType() != Material.AIR) continue;
+            if (entityLocation.getWorld() == null) continue;
+            Vector vel = new Vector(block.getX() - loc.getX(), block.getY() - loc.getY(), block.getZ() - loc.getZ());
+            entityLocation.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, block.getLocation(), 10, vel.getX(), vel.getY(), vel.getZ(), 0.05);
+        }
+    }
+
+
 }

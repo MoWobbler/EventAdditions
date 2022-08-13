@@ -75,7 +75,7 @@ public class ObjectiveObject {
         activate_at = System.currentTimeMillis() + this.secondsToCapture * 1000L;
         isTaskActive = true;
 
-        messageNearbyPlayers("A player has entered " + objectiveName, ChatColor.RED);
+        messageNearbyPlayers("An enemy has entered " + objectiveName, ChatColor.RED);
 
         bukkitTask1 = new BukkitRunnable() {
             @Override
