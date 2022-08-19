@@ -20,10 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class EventListener implements Listener {
 
@@ -250,6 +247,9 @@ public class EventListener implements Listener {
         }
     }
 
+
+
+
     @EventHandler
     public void projectileThrow(PlayerInteractEvent e) {
         if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
@@ -259,6 +259,10 @@ public class EventListener implements Listener {
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getItem() == null) return;
             if (e.getItem().getType().equals(Material.SPLASH_POTION) || e.getItem().getType().equals(Material.LINGERING_POTION)) {
+
+                if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
+                    return;
+                }
 
                 boolean throwFarther = hasCorrectItemLore(e.getItem(), "Throws Farther");
                 boolean flaming = hasCorrectItemLore(e.getItem(), "Flaming");

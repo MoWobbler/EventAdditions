@@ -44,7 +44,7 @@ public class SplashPotion {
         ThrownPotion thrownPotion = (ThrownPotion) player.getWorld().spawnEntity(location, EntityType.SPLASH_POTION);
         thrownPotion.setItem(baseItem);
         thrownPotion.setVelocity((player.getLocation()).getDirection().multiply(scalar));
-        Objects.requireNonNull(location.getWorld()).playSound(location, Sound.ENTITY_SPLASH_POTION_THROW, 10, .1f);
+        Objects.requireNonNull(location.getWorld()).playSound(location, Sound.ENTITY_SPLASH_POTION_THROW, 1, .1f);
 
         if (isFlaming) {
             flamingPotionIds.add(thrownPotion.getUniqueId());
