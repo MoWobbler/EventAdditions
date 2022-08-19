@@ -1,8 +1,11 @@
 # EventAdditions
 Add more features to be used in events
 - Capturable flag
+- Captureable objective area
 - Timer command
-- Try and change name in chat to correct team color
+- New potion modifiers
+- New snowball damage modifier
+- Change name in chat to correct team color
 
 
 Compiling
