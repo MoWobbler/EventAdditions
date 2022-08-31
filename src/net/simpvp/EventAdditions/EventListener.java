@@ -34,6 +34,10 @@ public class EventListener implements Listener {
             return;
         }
 
+        if (e.getPlayer().getGameMode().equals(GameMode.SPECTATOR) || e.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+            return;
+        }
+
         if (!CreateFlagCommand.flags.isEmpty()) {
             Team team = e.getPlayer().getScoreboard().getPlayerTeam(e.getPlayer());
 
@@ -138,6 +142,10 @@ public class EventListener implements Listener {
             return;
         }
 
+        if (e.getEntity().getPlayer().getGameMode().equals(GameMode.SPECTATOR) || e.getEntity().getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+            return;
+        }
+
         for (FlagObject flag: CreateFlagCommand.flags) {
             flag.nearbyPlayers.remove(e.getEntity().getPlayer());
         }
@@ -198,6 +206,10 @@ public class EventListener implements Listener {
             return;
         }
 
+        if (e.getPlayer().getGameMode().equals(GameMode.SPECTATOR) || e.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+            return;
+        }
+
         for (FlagObject flag: CreateFlagCommand.flags) {
             flag.nearbyPlayers.remove(e.getPlayer());
         }
@@ -216,6 +228,10 @@ public class EventListener implements Listener {
     @EventHandler
     public void logOut(PlayerQuitEvent e) {
         if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
+            return;
+        }
+
+        if (e.getPlayer().getGameMode().equals(GameMode.SPECTATOR) || e.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             return;
         }
 
@@ -301,7 +317,7 @@ public class EventListener implements Listener {
         if (SplashPotion.containsFlamingUUID(e.getEntity().getUniqueId())) {
             SplashPotion.removeFlamingUUID(e.getEntity().getUniqueId());
             Block centerBlock = e.getEntity().getLocation().getBlock();
-            ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 2);
+            ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 1);
             for (Block block: blocksInRadius) {
                 if (block.getType() != Material.AIR) continue;
                 block.setType(Material.FIRE);
@@ -339,7 +355,7 @@ public class EventListener implements Listener {
         if (SplashPotion.containsFlamingUUID(e.getEntity().getUniqueId())) {
             SplashPotion.removeFlamingUUID(e.getEntity().getUniqueId());
             Block centerBlock = e.getEntity().getLocation().getBlock();
-            ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 2);
+            ArrayList<Block> blocksInRadius = getBlocksInRadius(centerBlock, 1);
             for (Block block: blocksInRadius) {
                 if (block.getType() != Material.AIR) continue;
                 block.setType(Material.FIRE);
