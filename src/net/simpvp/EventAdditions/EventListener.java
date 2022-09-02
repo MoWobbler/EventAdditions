@@ -276,12 +276,36 @@ public class EventListener implements Listener {
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getItem() == null) return;
 
-            if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
-                e.setCancelled(true);
-                return;
+
+
+            if (hasCorrectItemLore(e.getItem(), "Cooldown") && e.getPlayer().getCooldown(e.getItem().getType()) == 0) {
+
+                if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
+                    e.setCancelled(true);
+                    return;
+                }
+
+                Material mat = e.getItem().getType();
+                if ((mat.equals(Material.SNOWBALL) || mat.equals(Material.SPLASH_POTION) || mat.equals(Material.LINGERING_POTION)) && (e.getPlayer().getGameMode() == GameMode.SURVIVAL || e.getPlayer().getGameMode() == GameMode.ADVENTURE)) {
+                    e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).setAmount(2);
+                } else {
+                    e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).setAmount(1);
+                }
+
+
+                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(EventAdditions.instance, () -> {
+                    e.getPlayer().getInventory().setItem(Objects.requireNonNull(e.getHand()),e.getItem());
+                    e.getPlayer().setCooldown(e.getItem().getType(), 60);
+                }, 0);
             }
 
             if (e.getItem().getType().equals(Material.SPLASH_POTION) || e.getItem().getType().equals(Material.LINGERING_POTION)) {
+
+
+                if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
+                    e.setCancelled(true);
+                    return;
+                }
 
 
                 boolean throwFarther = hasCorrectItemLore(e.getItem(), "Throws Farther");
@@ -299,6 +323,12 @@ public class EventListener implements Listener {
             }
 
             if (e.getItem().getType().equals(Material.SNOWBALL)) {
+
+                if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
+                    e.setCancelled(true);
+                    return;
+                }
+
                 if (hasCorrectItemLore(e.getItem(), "Damaging Snowball")) {
                     Location location = e.getPlayer().getLocation();
                     location.setY(location.getY() + 1.5);
@@ -314,19 +344,7 @@ public class EventListener implements Listener {
                 }
             }
 
-            if (hasCorrectItemLore(e.getItem(), "Cooldown") && e.getPlayer().getCooldown(e.getItem().getType()) == 0) {
 
-                Material mat = e.getItem().getType();
-                if (mat.equals(Material.SNOWBALL) || mat.equals(Material.SPLASH_POTION) || mat.equals(Material.LINGERING_POTION)) {
-                    e.getPlayer().getInventory().getItemInMainHand().setAmount(2);
-                } else {
-                    e.getPlayer().getInventory().getItemInMainHand().setAmount(1);
-                }
-
-                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(EventAdditions.instance, () -> {
-                    e.getPlayer().setCooldown(e.getItem().getType(), 60);
-                }, 0);
-            }
 
         }
     }
