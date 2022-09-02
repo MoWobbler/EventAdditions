@@ -275,11 +275,14 @@ public class EventListener implements Listener {
 
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getItem() == null) return;
+
+            if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
+                e.setCancelled(true);
+                return;
+            }
+
             if (e.getItem().getType().equals(Material.SPLASH_POTION) || e.getItem().getType().equals(Material.LINGERING_POTION)) {
 
-                if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
-                    return;
-                }
 
                 boolean throwFarther = hasCorrectItemLore(e.getItem(), "Throws Farther");
                 boolean flaming = hasCorrectItemLore(e.getItem(), "Flaming");
