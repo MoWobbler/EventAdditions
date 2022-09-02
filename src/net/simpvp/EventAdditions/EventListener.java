@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -309,6 +310,21 @@ public class EventListener implements Listener {
                     e.setCancelled(true);
                 }
             }
+
+            if (hasCorrectItemLore(e.getItem(), "Cooldown") && e.getPlayer().getCooldown(e.getItem().getType()) == 0) {
+
+                Material mat = e.getItem().getType();
+                if (mat.equals(Material.SNOWBALL) || mat.equals(Material.SPLASH_POTION) || mat.equals(Material.LINGERING_POTION)) {
+                    e.getPlayer().getInventory().getItemInMainHand().setAmount(2);
+                } else {
+                    e.getPlayer().getInventory().getItemInMainHand().setAmount(1);
+                }
+
+                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(EventAdditions.instance, () -> {
+                    e.getPlayer().setCooldown(e.getItem().getType(), 60);
+                }, 0);
+            }
+
         }
     }
 
