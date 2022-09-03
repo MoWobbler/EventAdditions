@@ -53,7 +53,6 @@ public class SplashPotion {
         if (isSmoking) {
             smokingPotionIds.add(thrownPotion.getUniqueId());
         }
-
     }
 
     public static boolean containsFlamingUUID(UUID uuid) {
