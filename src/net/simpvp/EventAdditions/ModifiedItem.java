@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class ModifiedItem {
     int damage = 0;
     int cooldownSeconds = 0;
     boolean depletable = true;
-    ArrayList<Integer> potionIds = new ArrayList<>();
+    Team team;
     UUID projectileID;
 
 
@@ -72,25 +73,43 @@ public class ModifiedItem {
                 depletable = false;
             }
 
+            modifierValue = hasModifyingItemLore(item, "ApplyTo");
+            if (modifierValue.size() > 0) {
+                team = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getTeam(modifierValue.get(0).strip());
+            }
 
             modifierValue = hasModifyingItemLore(item, "Potion");
             if (modifierValue.size() > 0) {
+                int counter = 0;
                 for (String s : modifierValue) {
-
-
                     String[] separatePotionEffects = s.split(" ");
+                    if (team != null) {
 
+                        for (Player p: Bukkit.getServer().getOnlinePlayers()) {
 
-                    player.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])), Integer.parseInt(separatePotionEffects[1]) * 20, Integer.parseInt(separatePotionEffects[2]) - 1));
+                            if (Objects.equals(p.getScoreboard().getPlayerTeam(p), team)) {
 
+                                if (p.getUniqueId() == player.getUniqueId() && counter == 0) {
+                                    player.sendMessage(ChatColor.GOLD + "Sending potion effects to " + team.getDisplayName());
+                                } else if (counter == 0) {
+                                    p.sendMessage(ChatColor.GOLD + "Potion effects received from " + player.getName());
+                                }
+
+                                p.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])), Integer.parseInt(separatePotionEffects[1]) * 20, Integer.parseInt(separatePotionEffects[2]) - 1));
+
+                            }
+                        }
+                        counter += 1;
+
+                    } else {
+                        player.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])), Integer.parseInt(separatePotionEffects[1]) * 20, Integer.parseInt(separatePotionEffects[2]) - 1));
+                    }
 
                 }
             }
         } catch (Exception e) {
             EventAdditions.instance.getLogger().info(e.getMessage());
         }
-
-
     }
 
 

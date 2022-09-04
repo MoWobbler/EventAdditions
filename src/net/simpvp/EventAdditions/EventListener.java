@@ -287,9 +287,10 @@ public class EventListener implements Listener {
                 ModifiedItem modifiedItem = new ModifiedItem(e.getItem(), e.getPlayer());
 
                 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(EventAdditions.instance, () -> {
-                    e.getPlayer().getInventory().setItem(Objects.requireNonNull(e.getHand()),e.getItem());
-                    e.getPlayer().setCooldown(e.getPlayer().getInventory().getItem(e.getHand()).getType(), modifiedItem.cooldownSeconds * 20);
+                    if (!(e.getItem().getAmount() == 0 && modifiedItem.isDepletable())) {
+                        e.getPlayer().setCooldown(e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).getType(), modifiedItem.cooldownSeconds * 20);
 
+                    }
                 }, 0);
 
                 if (modifiedItem.isItemThrowable()) {
@@ -331,7 +332,7 @@ public class EventListener implements Listener {
             return;
         }
 
-        if (ModifiedItem.hasModifyingItemLore(e.getItem(), "Cooldown").size() > 0) {
+        if (Objects.equals(ModifiedItem.hasModifyingItemLore(e.getItem(), "Depletable").get(0).strip(), "false")) {
             e.setCancelled(true);
         }
     }
