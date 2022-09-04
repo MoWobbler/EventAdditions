@@ -269,8 +269,6 @@ public class EventListener implements Listener {
     }
 
 
-
-
     @EventHandler
     public void ItemUseEvent(PlayerInteractEvent e) {
         if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
@@ -306,7 +304,12 @@ public class EventListener implements Listener {
         }
     }
 
+
     @EventHandler void ProjectileHit(ProjectileHitEvent e) {
+        if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getEntity()).getWorld().getName())) {
+            return;
+        }
+
         for (ModifiedItem item: modifiedItems.values()) {
             if (item.getUniqueId() == e.getEntity().getUniqueId()) {
                 if (item.smokeRadius > 0) {
@@ -323,14 +326,18 @@ public class EventListener implements Listener {
     }
 
 
+    @EventHandler void PotionDrink(PlayerItemConsumeEvent e) {
+        if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
+            return;
+        }
 
+        if (ModifiedItem.hasModifyingItemLore(e.getItem(), "Cooldown").size() > 0) {
+            e.setCancelled(true);
+        }
+    }
 
 
     public void playSoundEffect(Location location, Sound sound, float volume, float pitch) {
         Objects.requireNonNull(location.getWorld()).playSound(location, sound, volume , pitch);
     }
-
-
-
-
 }

@@ -95,12 +95,12 @@ public class ModifiedItem {
 
 
 
-    public List<String> hasModifyingItemLore(ItemStack item, String lore) {
+    public static List<String> hasModifyingItemLore(ItemStack item, String lore) {
         List<String> stringList = Objects.requireNonNull(item.getItemMeta()).getLore();
 
         List<String> matches = new ArrayList<>();
 
-        assert stringList != null;
+        if (stringList == null) return matches;
         for (String element: stringList) {
 
             if (element.startsWith(lore)) {
