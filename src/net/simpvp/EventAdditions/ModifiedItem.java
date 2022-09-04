@@ -198,7 +198,11 @@ public class ModifiedItem {
         location.setY(location.getY() + 1.5);
         ThrowableProjectile projectile = (ThrowableProjectile) player.getWorld().spawnEntity(location, entityType);
         projectile.setItem(item);
-        projectile.setVelocity((player.getLocation()).getDirection());
+        if (throwsFartherScalar <= 0) {
+            projectile.setVelocity((player.getLocation()).getDirection().multiply(1));
+        } else {
+            projectile.setVelocity((player.getLocation()).getDirection().multiply(throwsFartherScalar));
+        }
         projectileID = projectile.getUniqueId();
         EventListener.modifiedItems.put(projectile.getUniqueId(),this);
     }
