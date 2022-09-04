@@ -180,7 +180,6 @@ public class ModifiedItem {
         ThrowableProjectile projectile = (ThrowableProjectile) player.getWorld().spawnEntity(location, entityType);
         projectile.setItem(item);
         projectile.setVelocity((player.getLocation()).getDirection());
-        //item.setAmount(item.getAmount() - 1);
         projectileID = projectile.getUniqueId();
         EventListener.modifiedItems.put(projectile.getUniqueId(),this);
     }

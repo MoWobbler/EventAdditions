@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
@@ -139,6 +140,11 @@ public class EventListener implements Listener {
 
         if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getEntity().getPlayer()).getWorld().getName())) {
             return;
+        }
+
+        for (ItemStack material: e.getEntity().getPlayer().getInventory()) {
+            if (material == null) continue;
+            e.getEntity().getPlayer().setCooldown(material.getType(), 0);
         }
 
         if (e.getEntity().getPlayer().getGameMode().equals(GameMode.SPECTATOR) || e.getEntity().getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
@@ -271,8 +277,6 @@ public class EventListener implements Listener {
             return;
         }
 
-
-
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             if (e.getItem() == null) return;
 
@@ -281,7 +285,7 @@ public class EventListener implements Listener {
                 return;
             }
 
-            if (Objects.requireNonNull(e.getItem().getItemMeta()).hasLore()) {
+            if (Objects.requireNonNull(e.getItem().getItemMeta()).hasLore() && !Objects.requireNonNull(e.getItem().getItemMeta().getLore()).contains("(+NBT)")) {
                 ModifiedItem modifiedItem = new ModifiedItem(e.getItem(), e.getPlayer());
 
                 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(EventAdditions.instance, () -> {
@@ -298,16 +302,7 @@ public class EventListener implements Listener {
                 if (modifiedItem.isDepletable()) {
                     e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).setAmount(e.getItem().getAmount() - 1);
                 }
-
-
-
-
-
             }
-
-
-
-
         }
     }
 
