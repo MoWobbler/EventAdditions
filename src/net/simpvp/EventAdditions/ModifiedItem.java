@@ -216,6 +216,11 @@ public class ModifiedItem {
         if (item.getType() == Material.SPLASH_POTION) {
             summonModifiedPotion();
         }
+
+        if (item.getType() == Material.LINGERING_POTION) {
+            summonModifiedPotion();
+        }
+
     }
 
 
