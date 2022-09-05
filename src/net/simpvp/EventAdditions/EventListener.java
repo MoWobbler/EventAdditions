@@ -283,12 +283,15 @@ public class EventListener implements Listener {
                 return;
             }
 
-            if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
-                e.setCancelled(true);
-                return;
-            }
+
 
             if (Objects.requireNonNull(e.getItem().getItemMeta()).hasLore() && !Objects.requireNonNull(e.getItem().getItemMeta().getLore()).contains("(+NBT)")) {
+
+                if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
+                    e.setCancelled(true);
+                    return;
+                }
+
                 ModifiedItem modifiedItem = new ModifiedItem(e.getItem(), e.getPlayer());
 
                 e.getPlayer().setCooldown(e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).getType(), modifiedItem.cooldownSeconds * 20);
