@@ -283,15 +283,15 @@ public class EventListener implements Listener {
                 return;
             }
 
+            if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
+                e.setCancelled(true);
+                return;
+            }
+
             if (Objects.requireNonNull(e.getItem().getItemMeta()).hasLore() && !Objects.requireNonNull(e.getItem().getItemMeta().getLore()).contains("(+NBT)")) {
                 ModifiedItem modifiedItem = new ModifiedItem(e.getItem(), e.getPlayer());
 
-                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(EventAdditions.instance, () -> {
-                    if (!(e.getItem().getAmount() == 0 && modifiedItem.isDepletable())) {
-                        e.getPlayer().setCooldown(e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).getType(), modifiedItem.cooldownSeconds * 20);
-
-                    }
-                }, 0);
+                e.getPlayer().setCooldown(e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).getType(), modifiedItem.cooldownSeconds * 20);
 
                 if (modifiedItem.isItemThrowable()) {
                     modifiedItem.summonModifiedProjectile();
