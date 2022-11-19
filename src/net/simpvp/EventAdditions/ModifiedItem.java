@@ -10,16 +10,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ModifiedItem {
 
     Player player;
     ItemStack item;
-    int throwsFartherScalar = 0;
+    float throwsFartherScalar = 0f;
     int smokeRadius = 0;
     int flameRadius = 0;
     int damage = 0;
@@ -44,8 +41,8 @@ public class ModifiedItem {
         try {
 
             List<String> modifierValue = hasModifyingItemLore(item, "ThrowsFarther");
-            if (modifierValue.size() > 0 && Integer.parseInt(modifierValue.get(0).strip()) > 0) {
-                throwsFartherScalar = Integer.parseInt(modifierValue.get(0).strip());
+            if (modifierValue.size() > 0 && Float.parseFloat(modifierValue.get(0).strip()) > 0f) {
+                throwsFartherScalar = Float.parseFloat(modifierValue.get(0).strip());
             }
 
             modifierValue = hasModifyingItemLore(item, "Smoking");
@@ -104,11 +101,10 @@ public class ModifiedItem {
                     } else {
                         player.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])), Integer.parseInt(separatePotionEffects[1]) * 20, Integer.parseInt(separatePotionEffects[2]) - 1));
                     }
-
                 }
             }
         } catch (Exception e) {
-            EventAdditions.instance.getLogger().info(e.getMessage());
+            EventAdditions.instance.getLogger().info(e.toString());
         }
     }
 
@@ -137,7 +133,7 @@ public class ModifiedItem {
                 item == Material.SNOWBALL || item == Material.ENDER_PEARL;
     }
 
-    public ArrayList<Block> getBlocksInRadius(Block start, int radius){
+    public ArrayList<Block> getBlocksInRadius(Block start, int radius) {
         ArrayList<Block> blocks = new ArrayList<>();
         for(double x = start.getLocation().getX() - radius; x <= start.getLocation().getX() + radius; x++){
             for(double y = start.getLocation().getY() - radius; y <= start.getLocation().getY() + radius; y++){
@@ -198,7 +194,7 @@ public class ModifiedItem {
         location.setY(location.getY() + 1.5);
         ThrowableProjectile projectile = (ThrowableProjectile) player.getWorld().spawnEntity(location, entityType);
         projectile.setItem(item);
-        if (throwsFartherScalar <= 0) {
+        if (throwsFartherScalar <= 0f) {
             projectile.setVelocity((player.getLocation()).getDirection().multiply(1));
         } else {
             projectile.setVelocity((player.getLocation()).getDirection().multiply(throwsFartherScalar));
