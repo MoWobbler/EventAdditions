@@ -203,6 +203,7 @@ public class ModifiedItem {
         } else {
             projectile.setVelocity((player.getLocation()).getDirection().multiply(throwsFartherScalar));
         }
+        projectile.setShooter(player);
         projectileID = projectile.getUniqueId();
         EventListener.modifiedItems.put(projectile.getUniqueId(),this);
     }
