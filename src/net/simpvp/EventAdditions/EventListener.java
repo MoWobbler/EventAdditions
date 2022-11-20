@@ -16,15 +16,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class EventListener implements Listener {
 
     public static HashMap<UUID, ModifiedItem> modifiedItems = new HashMap<>();
-    ArrayList<UUID> snowballIds = new ArrayList<>();
 
     /* Test for players near a flag */
     @EventHandler
@@ -283,8 +279,6 @@ public class EventListener implements Listener {
                 return;
             }
 
-
-
             if (Objects.requireNonNull(e.getItem().getItemMeta()).hasLore() && !Objects.requireNonNull(e.getItem().getItemMeta().getLore()).contains("(+NBT)")) {
 
                 if (e.getClickedBlock() != null && e.getClickedBlock().getType().isInteractable()) {
@@ -326,7 +320,6 @@ public class EventListener implements Listener {
 
             }
         }
-
     }
 
 
@@ -334,8 +327,9 @@ public class EventListener implements Listener {
         if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
             return;
         }
-
-        if (Objects.equals(ModifiedItem.hasModifyingItemLore(e.getItem(), "Depletable").get(0).strip(), "false")) {
+        List<String> listOfLore = ModifiedItem.hasModifyingItemLore(e.getItem(), "Depletable");
+        if (listOfLore.size() <= 0) return;
+        if (Objects.equals(listOfLore.get(0).strip(), "false")) {
             e.setCancelled(true);
         }
     }
