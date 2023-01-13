@@ -1,0 +1,128 @@
+mobs:
+  zombie:
+    #plain zombie
+    mob: zombie
+    name:
+    isNameVisible: false
+  leatherzombie:
+    #zombie with leather armor
+    mob: zombie
+    name:
+    isNameVisible: false
+  ironzombie:
+    #zombie with iron armor
+    mob: zombie
+    name:
+    isNameVisible: false
+  diamondzombie:
+    #zombie with diamond armor
+    mob: zombie
+    name:
+    isNameVisible: false
+  husk:
+    #plain husk
+    mob: husk
+    name:
+    isNameVisible: false
+  leatherhusk:
+    #husk with leather armor
+    mob: husk
+    name:
+    isNameVisible: false
+  ironhusk:
+    #husk with iron armor
+    mob: husk
+    name:
+    isNameVisible: false
+  diamondhusk:
+    #husk with diamond armor
+    mob: husk
+    name:
+    isNameVisible: false
+  skeleton:
+    #plain skeleton with no bow
+    mob: skeleton
+    name:
+    isNameVisible: false
+
+
+armorSets:
+  none:
+    helmet: stone_button
+    chestplate: none
+    leggings: none
+    boots: none
+  leather:
+    helmet: leather_helmet
+    chestplate: leather_chestplate
+    leggings: leather_leggings
+    boots: leather_boots
+  chain:
+    helmet: chain_helmet
+    chestplate: chain_chestplate
+    leggings: chain_leggings
+    boots: chain_boots
+  iron:
+    helmet: iron_helmet
+    chestplate: iron_chestplate
+    leggings: iron_leggings
+    boots: iron_boots
+  diamond:
+    helmet: diamond_helmet
+    chestplate: diamond_chestplate
+    leggings: diamond_leggings
+    boots: diamond_boots
+  netherite:
+    helmet: netherite_helmet
+    chestplate: netherite_chestplate
+    leggings: netherite_leggings
+    boots: netherite_boots
+
+
+weaponSets:
+  none:
+    mainhand: air
+    offhand: air
+  woodenpickaxe:
+    mainhand: wooden_pickaxe
+    offhand: air
+  stonepickaxe:
+    mainhand: stone_pickaxe
+    offhand: air
+  ironpickaxe:
+    mainhand: iron_pickaxe
+    offhand: air
+  woodenhoe:
+    woodenpickaxe:
+      mainhand: wooden_hoe
+      offhand: air
+  stonehoe:
+    mainhand: stone_hoe
+    offhand: air
+  ironhoe:
+    mainhand: iron_hoe
+    offhand: air
+  woodensword:
+    mainhand: wooden_sword
+    offhand: air
+  stonesword:
+    mainhand: stone_sword
+    offhand: air
+  ironsword:
+    mainhand: iron_sword
+    offhand: air
+  diamondsword:
+    mainhand: diamond_sword
+    offhand: air
+  netheritesword:
+    mainhand: netherite_sword
+    offhand: air
+  woodenaxe:
+    mainhand: wooden_axe
+    offhand: wooden_axe
+  stoneaxe:
+    mainhand: stone_axe
+    offhand: stone_axe
+  ironaxe:
+    mainhand: iron_axe
+    offhand: iron_axe

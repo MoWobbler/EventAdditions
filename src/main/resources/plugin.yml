@@ -1,0 +1,22 @@
+name: EventAdditions
+version: 2.0
+main: net.simpvp.EventAdditions.EventAdditions
+api-version: 1.15
+description: Add features to make better minigames
+commands:
+  createflag:
+    description: create a flag
+  deleteflags:
+    description: delete all flags
+  timer:
+    description: start a timer
+  stoptimers:
+    description: stop all timer
+  tagevent:
+    description: tag and untag players in a minigame
+  createobjective:
+    description: create an objective
+  deleteobjectives:
+    description: delete all objectives
+  mobwave:
+    description: create a new wave of mobs
