@@ -31,5 +31,6 @@ public class EventAdditions extends JavaPlugin {
         getCommand("createobjective").setExecutor(new CreateObjectiveCommand());
         getCommand("deleteobjectives").setExecutor(new DeleteObjectivesCommand());
         getCommand("mobwave").setExecutor(new MobWaveCommand());
+        getCommand("endmobwaves").setExecutor(new EndMobWaves());
     }
 }

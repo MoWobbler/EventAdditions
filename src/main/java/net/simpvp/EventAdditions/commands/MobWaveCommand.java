@@ -70,7 +70,7 @@ public class MobWaveCommand implements CommandExecutor {
         }
 
         List<CustomMob> clonedList = new ArrayList<>(customMobs); // Weird workaround to pass the list by value
-        new MobWave(location, x1, y1, z1, x2, y2, z2, totalMobsToSpawn, totalWaveSeconds, betterTargeting, clonedList);
+        new MobWave(location, x1, y1, z1, x2, y2, z2, totalMobsToSpawn, totalWaveSeconds, betterTargeting, clonedList, cmdBlock);
 
         return true;
     }
@@ -97,12 +97,7 @@ public class MobWaveCommand implements CommandExecutor {
     * zombie,50%ironzombie{armor=diamond}
     * zombie,50%ironzombie{armor=iron,weapons=ironaxe} */
     private boolean parseMobData(String mobData, Boolean betterTargeting,BlockCommandSender cmdBlock) {
-        Pattern p = Pattern.compile("(\\d+)%?([\\w]+)?(?:\\{(?:armor=([\\w]+),?)?(?:weapons=([\\w]+),?)?\\})?,?");
-        // Example regex matches:
-        // zombie
-        // 50%zombie,70%leatherzombie
-        // zombie,50%ironzombie{armor=diamond}
-        // zombie,50%ironzombie{armor=iron,weapons=ironaxe}
+        Pattern p = Pattern.compile("(\\d+)?%?([a-zA-Z]+),?(?:\\{(?:armor=([\\w]+),?)?(?:weapons=([\\w]+),?)?})?,?");
         Matcher m = p.matcher(mobData);
         while (m.find()) {
             int percent = 100;
@@ -147,7 +142,7 @@ public class MobWaveCommand implements CommandExecutor {
         }
         try {
             return EntityType.valueOf(mob.toString().toUpperCase());
-        } catch (IllegalArgumentException NullPointerException) {
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }

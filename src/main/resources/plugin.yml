@@ -20,3 +20,5 @@ commands:
     description: delete all objectives
   mobwave:
     description: create a new wave of mobs
+  endmobwaves:
+    description: stop all mob waves

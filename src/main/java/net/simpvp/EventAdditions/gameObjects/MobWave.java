@@ -1,15 +1,13 @@
 package net.simpvp.EventAdditions.gameObjects;
 
 import net.simpvp.EventAdditions.EventAdditions;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import net.simpvp.EventAdditions.commands.EndMobWaves;
+import org.bukkit.*;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -29,7 +27,7 @@ public class MobWave {
 
     public MobWave(Location location, int x1, int y1, int z1, int x2, int y2, int z2,
                    int totalMobsToSpawn, int totalWaveSeconds,
-                   boolean betterTargeting, List<CustomMob> customMobs) {
+                   boolean betterTargeting, List<CustomMob> customMobs, BlockCommandSender cmdBlock) {
         this.startTime = System.currentTimeMillis();
         this.config = EventAdditions.mobConfig.getConfig();
         this.random = new Random();
@@ -45,8 +43,10 @@ public class MobWave {
         this.customMobs = customMobs;
         this.betterTargeting = betterTargeting;
         activate_at = System.currentTimeMillis() + totalWaveSeconds * 1000L;
-        this.possibleLocations = getAllSurfaceLocations(location.getWorld(),x1, y1, z1,x2, y2, z2);
-        if (this.possibleLocations.isEmpty()) { //TODO move to command check
+        this.possibleLocations = getAllSurfaceLocations(location.getWorld(), x1, y1, z1, x2, y2, z2);
+
+        if (this.possibleLocations.isEmpty()) {
+            cmdBlock.sendMessage(ChatColor.RED + "No valid spawn locations were found");
             return;
         }
         startRepeatingSpawnTask(totalMobsToSpawn, totalWaveSeconds);
@@ -60,7 +60,6 @@ public class MobWave {
             int probability = customMob.getPercentage();
             if (r < probability) {
                 customMob.spawn(getRandomLocation(), amountPerSpawn);
-
                 break;
             } else {
                 r -= probability;
@@ -74,21 +73,15 @@ public class MobWave {
     private void startRepeatingSpawnTask(int totalMobsToSpawn, int totalWaveSeconds) {
 
         final int[] remaining = {totalMobsToSpawn};
-
-
-
         double delay = (double) totalWaveSeconds / totalMobsToSpawn;
-
-
-
-
         final int[] amountPerSpawn = {(int) Math.floor(((double)totalMobsToSpawn / totalWaveSeconds) / (20.0 / totalWaveSeconds))};
 
         if (amountPerSpawn[0] <= 0) {
             amountPerSpawn[0] = 1;
         }
 
-        EventAdditions.instance.getLogger().info(Arrays.toString(amountPerSpawn));
+        EndMobWaves.storeMobWave(this);
+
 
         long ticks = (long) (delay * 20 * amountPerSpawn[0]); // Time between each mob spawn
 
@@ -96,6 +89,11 @@ public class MobWave {
         for (CustomMob customMob : customMobs) {
             totalProbability[0] += customMob.getPercentage();
         }
+        if (totalProbability[0] == 0) {
+            totalProbability[0] = 100;
+        }
+
+
 
         // Repeating task
         timer = Bukkit.getScheduler().runTaskTimer(
@@ -104,8 +102,9 @@ public class MobWave {
                     remaining[0] -= amountPerSpawn[0];
                     if (remaining[0] == 0) {
                         this.location.getBlock().getRelative(0, 2, 0).setType(Material.REDSTONE_BLOCK);
-                        timer.cancel();
-                        EventAdditions.instance.getLogger().info("Time: " + (System.currentTimeMillis() - startTime));
+                        stopMobWave();
+                        EndMobWaves.removeMobWave(this);
+                        //EventAdditions.instance.getLogger().info("Time: " + (System.currentTimeMillis() - startTime));
                     }
                 }, 0L, ticks
         );
@@ -158,17 +157,24 @@ public class MobWave {
     }
 
 
-    /* Iterate through all x and z coordinates.
+    /* Iterate through all x and z coordinates in the given selection.
     Get the surface block at each x and z coordinate, then store the locations */
     private List<Location> getAllSurfaceLocations(World world, int x1, int y1, int z1, int x2, int y2, int z2) {
         List<Location> locations = new ArrayList<>();
         for (int x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
             for (int z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
                 Location location = getSurfaceBlock(world, x, z, Math.min(y1, y2), Math.max(y1,y2));
+                if (location == null) {
+                    continue;
+                }
                 locations.add(location);
             }
         }
         return locations;
+    }
+
+    public void stopMobWave() {
+        timer.cancel();
     }
 
 

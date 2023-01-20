@@ -17,10 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
@@ -364,6 +361,19 @@ public class EventListener implements Listener {
         }
         if (e.getEntity().hasMetadata("mobWaveMob")) {
             e.getDrops().clear();
+        }
+    }
+
+    @EventHandler void CustomMobForgetsTarget(EntityTargetEvent e) {
+        if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getEntity().getWorld().getName()))) {
+            return;
+        }
+        if (!e.getEntity().hasMetadata("mobWaveMob")) {
+            return;
+        }
+        //EventAdditions.instance.getLogger().info(e.getEntityType() + ": " + e.getReason());
+        if (e.getReason().equals(EntityTargetEvent.TargetReason.FORGOT_TARGET)) {
+            e.setCancelled(true);
         }
     }
 
