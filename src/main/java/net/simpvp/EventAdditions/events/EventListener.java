@@ -295,7 +295,8 @@ public class EventListener implements Listener {
             if (Objects.requireNonNull(e.getItem().getItemMeta()).hasLore() && !Objects.requireNonNull(e.getItem().getItemMeta().getLore()).contains("(+NBT)")) {
 
 
-                if (!Objects.requireNonNull(e.getItem().getItemMeta().getLore().get(0)).equalsIgnoreCase("event additions")) {
+                if (!(Objects.requireNonNull(e.getItem().getItemMeta().getLore().get(0)).equalsIgnoreCase("event additions") ||
+                        Objects.requireNonNull(e.getItem().getItemMeta().getLore().get(0)).equalsIgnoreCase("ea"))) {
                     return;
                 }
 
