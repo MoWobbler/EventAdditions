@@ -22,3 +22,7 @@ commands:
     description: create a new wave of mobs
   endmobwaves:
     description: stop all mob waves
+  shopitem:
+    description: create a sign shop
+  signshop:
+    description: create a sign shop

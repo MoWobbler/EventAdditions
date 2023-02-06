@@ -4,6 +4,7 @@ import net.simpvp.EventAdditions.commands.*;
 import net.simpvp.EventAdditions.events.EventListener;
 import net.simpvp.EventAdditions.gameObjects.TagMinigame;
 import net.simpvp.EventAdditions.util.ConfigUtil;
+import org.bukkit.block.Sign;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -32,5 +33,7 @@ public class EventAdditions extends JavaPlugin {
         getCommand("deleteobjectives").setExecutor(new DeleteObjectivesCommand());
         getCommand("mobwave").setExecutor(new MobWaveCommand());
         getCommand("endmobwaves").setExecutor(new EndMobWaves());
+        getCommand("shopitem").setExecutor(new ShopItemCommand());
+        getCommand("signshop").setExecutor(new SignShopCommand());
     }
 }

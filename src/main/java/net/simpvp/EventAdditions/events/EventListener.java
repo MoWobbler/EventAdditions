@@ -3,23 +3,25 @@ package net.simpvp.EventAdditions.events;
 import net.simpvp.EventAdditions.EventAdditions;
 import net.simpvp.EventAdditions.commands.CreateFlagCommand;
 import net.simpvp.EventAdditions.commands.CreateObjectiveCommand;
+import net.simpvp.EventAdditions.commands.SignShopCommand;
 import net.simpvp.EventAdditions.commands.TimerCommand;
-import net.simpvp.EventAdditions.gameObjects.FlagObject;
-import net.simpvp.EventAdditions.gameObjects.ModifiedItem;
-import net.simpvp.EventAdditions.gameObjects.ObjectiveObject;
-import net.simpvp.EventAdditions.gameObjects.TagMinigame;
+import net.simpvp.EventAdditions.gameObjects.*;
 import net.simpvp.EventAdditions.gameObjects.Timer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
@@ -279,6 +281,20 @@ public class EventListener implements Listener {
     public void ItemUseEvent(PlayerInteractEvent e) {
         if (!EventAdditions.listOfWorlds.contains(Objects.requireNonNull(e.getPlayer()).getWorld().getName())) {
             return;
+        }
+
+
+
+        if (e.getClickedBlock() != null && e.getClickedBlock().getState() instanceof Sign
+        && e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            for (ShopSign s : SignShopCommand.shops) {
+                if (s.isShopLocation(e.getClickedBlock().getLocation())) {
+                    s.transaction(e.getPlayer());
+                    return;
+                }
+            }
+            return;
+
         }
 
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
