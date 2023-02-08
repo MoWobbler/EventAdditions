@@ -81,7 +81,6 @@ public class ShopItemCommand implements CommandExecutor {
             try {
                 enchantments.put(enchantment, Integer.parseInt(matcher.group(2).strip()));
             } catch (NumberFormatException e) {
-                e.printStackTrace();
                 cmdBlock.sendMessage("Invalid enchantment level: " + matcher.group(2).strip());
                 return false;
             }
@@ -103,6 +102,32 @@ public class ShopItemCommand implements CommandExecutor {
             unbreakable = Boolean.parseBoolean(matcher.group(1));
         }
 
+        // Check for a shop item id for when this item is upgraded
+        Pattern upgradePattern = Pattern.compile("upgrade:\"([\\w]+)\"");
+        matcher = upgradePattern.matcher(input);
+        ShopItem upgrade = null;
+        if (matcher.find()) {
+            for (ShopItem shopItem : shopItems) {
+                if (shopItem.isItemId(matcher.group(1))) {
+                    upgrade = shopItem;
+                }
+            }
+        }
+
+        // Get how much an upgrade costs
+        Pattern upgradeCostPattern = Pattern.compile("upgradecost:\"([\\w]+)\"");
+        matcher = upgradeCostPattern.matcher(input);
+        int upgradeCost = 0;
+        if (matcher.find()) {
+            try {
+                upgradeCost = Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException e) {
+                cmdBlock.sendMessage("Invalid upgrade cost: " + matcher.group(1));
+                return false;
+            }
+        }
+
+        // Make sure the given material is valid
         Material material;
         try {
             material = Material.valueOf(args[1].toUpperCase());
@@ -111,6 +136,7 @@ public class ShopItemCommand implements CommandExecutor {
             return false;
         }
 
+        // Make sure the given amount of objects is valid
         int amount;
         try {
             amount = Integer.parseInt(args[2]);
@@ -119,7 +145,8 @@ public class ShopItemCommand implements CommandExecutor {
             return false;
         }
 
-        ShopItem shopItem = new ShopItem(id, customName, material, lore, enchantments, unbreakable, amount);
+        ShopItem shopItem = new ShopItem(id, customName, material, lore, enchantments, unbreakable, amount,
+                upgrade, upgradeCost);
         shopItems.add(shopItem);
         cmdBlock.sendMessage("Added a new shop item");
 

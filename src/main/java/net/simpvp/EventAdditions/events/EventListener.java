@@ -285,16 +285,23 @@ public class EventListener implements Listener {
 
 
 
-        if (e.getClickedBlock() != null && e.getClickedBlock().getState() instanceof Sign
-        && e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-            for (ShopSign s : SignShopCommand.shops) {
-                if (s.isShopLocation(e.getClickedBlock().getLocation())) {
-                    s.transaction(e.getPlayer());
-                    return;
+        if (e.getClickedBlock() != null && e.getClickedBlock().getState() instanceof Sign) {
+            if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+                for (ShopSign s : SignShopCommand.shops) {
+                    if (s.isShopLocation(e.getClickedBlock().getLocation())) {
+                        s.transaction(e.getPlayer());
+                        return;
+                    }
+                }
+                return;
+            } else if (e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+                for (ShopSign s : SignShopCommand.shops) {
+                    if (s.isShopLocation(e.getClickedBlock().getLocation())) {
+                        s.printNextPurchase(e.getPlayer());
+                        return;
+                    }
                 }
             }
-            return;
-
         }
 
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {

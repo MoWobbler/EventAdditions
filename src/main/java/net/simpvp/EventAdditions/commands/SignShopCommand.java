@@ -42,7 +42,6 @@ public class SignShopCommand implements CommandExecutor {
             return true;
         }
 
-
         int x, y, z, cost;
         try {
             x = Integer.parseInt(args[0]);
@@ -62,10 +61,15 @@ public class SignShopCommand implements CommandExecutor {
             return true;
         }
 
+        // success and failure messages need to have underscores for spaces
+        String successMessage = args[4];
+        successMessage = successMessage.replace('_',' ');
+        String failureMessage = args[5];
+        failureMessage = failureMessage.replace('_', ' ');
         List<ShopItem> customItems = new ArrayList<>();
 
         // Match the ids from the command with the ids in the shopItems list
-        for (int i = 4; i < args.length; i++) {
+        for (int i = 6; i < args.length; i++) {
             boolean itemFound = false;
             for (int j = 0; j < ShopItemCommand.shopItems.size(); j++) {
                 if (ShopItemCommand.shopItems.get(j).isItemId(args[i])) {
@@ -79,10 +83,9 @@ public class SignShopCommand implements CommandExecutor {
             }
         }
 
-        ShopSign shopSign = new ShopSign(location, customItems, cost);
+        ShopSign shopSign = new ShopSign(location, customItems, cost, successMessage, failureMessage);
         shops.add(shopSign);
         cmdBlock.sendMessage("Created new sign shop");
-
         return true;
     }
 }
