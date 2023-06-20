@@ -80,12 +80,16 @@ public class TagMinigame implements CommandExecutor {
 
     /* Kill all players who are "it" */
     public void killTaggedPlayers() {
-        for (Player p: taggedPlayers) {
-            p.removePotionEffect(PotionEffectType.SPEED);
-            p.removePotionEffect(PotionEffectType.GLOWING);
-            p.setHealth(0.0);
+        try {
+            for (Player p : taggedPlayers) {
+                p.removePotionEffect(PotionEffectType.SPEED);
+                p.removePotionEffect(PotionEffectType.GLOWING);
+                p.setHealth(0.0);
+            }
+            taggedPlayers.clear();
+        } catch (Exception ignored) {
+
         }
-        taggedPlayers.clear();
     }
 
     /* Remove "it" status from player */
