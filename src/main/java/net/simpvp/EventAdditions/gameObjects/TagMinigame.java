@@ -57,6 +57,9 @@ public class TagMinigame implements CommandExecutor {
 
     /* Find a player to tag by name or a random player to tag */
     public void findPlayerToTag(String string) {
+        if (nearbyTaggablePlayers.isEmpty()) {
+            return;
+        }
         Player player = Bukkit.getServer().getPlayer(string);
         if (string.equalsIgnoreCase("-random")) {
             int random = new Random().nextInt(nearbyTaggablePlayers.size());
