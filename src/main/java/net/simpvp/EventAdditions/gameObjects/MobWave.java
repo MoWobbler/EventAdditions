@@ -100,7 +100,7 @@ public class MobWave {
                 EventAdditions.instance, () -> {
                     spawnCustomMob(totalProbability[0], amountPerSpawn[0]);
                     remaining[0] -= amountPerSpawn[0];
-                    if (remaining[0] == 0) {
+                    if (remaining[0] <= 0) {
                         this.location.getBlock().getRelative(0, 2, 0).setType(Material.REDSTONE_BLOCK);
                         stopMobWave();
                         EndMobWaves.removeMobWave(this);
