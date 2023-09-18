@@ -21,13 +21,14 @@ public class MobWave {
     List<CustomMob> customMobs;
     List<Location> possibleLocations;
     boolean betterTargeting;
+    int healthScale;
     BukkitTask timer;
     long activate_at;
     long startTime;
 
     public MobWave(Location location, int x1, int y1, int z1, int x2, int y2, int z2,
                    int totalMobsToSpawn, int totalWaveSeconds,
-                   boolean betterTargeting, List<CustomMob> customMobs, BlockCommandSender cmdBlock) {
+                   boolean betterTargeting, int healthScale, List<CustomMob> customMobs, BlockCommandSender cmdBlock) {
         this.startTime = System.currentTimeMillis();
         this.config = EventAdditions.mobConfig.getConfig();
         this.random = new Random();
@@ -42,6 +43,7 @@ public class MobWave {
         this.totalWaveSeconds = totalWaveSeconds;
         this.customMobs = customMobs;
         this.betterTargeting = betterTargeting;
+        this.healthScale = healthScale;
         activate_at = System.currentTimeMillis() + totalWaveSeconds * 1000L;
         this.possibleLocations = getAllSurfaceLocations(location.getWorld(), x1, y1, z1, x2, y2, z2);
 
@@ -59,7 +61,7 @@ public class MobWave {
         for (CustomMob customMob : customMobs) {
             int probability = customMob.getPercentage();
             if (r < probability) {
-                customMob.spawn(getRandomLocation(), amountPerSpawn);
+                customMob.spawn(getRandomLocation(), amountPerSpawn, healthScale);
                 break;
             } else {
                 r -= probability;
@@ -109,34 +111,6 @@ public class MobWave {
                 }, 0L, ticks
         );
     }
-
-
-
-//        final int[] remaining = {totalMobsToSpawn};
-//        double delay = (double) totalWaveSeconds / totalMobsToSpawn;
-//        long ticks = (long) (delay * 20); // Time between each mob spawn
-//
-//        final int[] totalProbability = {0};
-//        for (CustomMob customMob : customMobs) {
-//            totalProbability[0] += customMob.getPercentage();
-//        }
-//
-//        // Async repeating task
-//        timer = Bukkit.getScheduler().runTaskTimerAsynchronously(
-//                EventAdditions.instance, () -> Bukkit.getScheduler().callSyncMethod(EventAdditions.instance,
-//                        (Callable<Void>) () -> {
-//                            spawnCustomMob(totalProbability[0]);
-//                            remaining[0]--;
-//                            if (remaining[0] == 0) {
-//                                this.location.getBlock().getRelative(0,2,0).setType(Material.REDSTONE_BLOCK);
-//                                timer.cancel();
-//                                EventAdditions.instance.getLogger().info("Start time: " + (System.currentTimeMillis() - startTime));
-//                            }
-//                            return null;
-//                        }
-//                ), 0L, ticks
-//        );
-    //}
 
     /* Get a random location from the possibleLocations list */
     private Location getRandomLocation() {

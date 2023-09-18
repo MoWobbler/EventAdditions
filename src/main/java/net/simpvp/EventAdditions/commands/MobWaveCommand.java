@@ -39,8 +39,8 @@ public class MobWaveCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length != 10) {
-            cmdBlock.sendMessage(ChatColor.RED + "Usage: /mobwave x1 y1 z1 x2 y2 z2 mobsToSpawn seconds targeting zombiedata");
+        if (args.length != 11) {
+            cmdBlock.sendMessage(ChatColor.RED + "Usage: /mobwave x1 y1 z1 x2 y2 z2 mobsToSpawn seconds targeting healthScale zombiedata");
             return true;
         }
 
@@ -48,6 +48,7 @@ public class MobWaveCommand implements CommandExecutor {
         int totalMobsToSpawn;
         int totalWaveSeconds;
         boolean betterTargeting;
+        int healthScale;
         Location location = cmdBlock.getBlock().getLocation();
 
         try {
@@ -60,17 +61,18 @@ public class MobWaveCommand implements CommandExecutor {
             totalMobsToSpawn = Integer.parseInt(args[6]);
             totalWaveSeconds = Integer.parseInt(args[7]);
             betterTargeting = Boolean.parseBoolean(args[8]);
+            healthScale = Integer.parseInt(args[9]);
         } catch (Exception e) {
-            cmdBlock.sendMessage("Correct usage: mobwave x1 y1 z1 x2 y2 z2 amountOfMobs seconds targeting zombiedata");
+            cmdBlock.sendMessage("Correct usage: mobwave x1 y1 z1 x2 y2 z2 amountOfMobs seconds targeting healthScale zombiedata");
             return false;
         }
 
-        if (!parseMobData(args[9], betterTargeting, cmdBlock)) {
+        if (!parseMobData(args[10], betterTargeting, cmdBlock)) {
             return true;
         }
 
         List<CustomMob> clonedList = new ArrayList<>(customMobs); // Weird workaround to pass the list by value
-        new MobWave(location, x1, y1, z1, x2, y2, z2, totalMobsToSpawn, totalWaveSeconds, betterTargeting, clonedList, cmdBlock);
+        new MobWave(location, x1, y1, z1, x2, y2, z2, totalMobsToSpawn, totalWaveSeconds, betterTargeting, healthScale, clonedList, cmdBlock);
 
         return true;
     }

@@ -1,8 +1,11 @@
 package net.simpvp.EventAdditions.gameObjects;
 
 import net.simpvp.EventAdditions.EventAdditions;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -47,7 +50,19 @@ public class CustomMob {
 
 
     /* Spawn the mob at the given location */
-    public void spawn(Location location, int amount) {
+    public void spawn(Location location, int amount, int healthScale) {
+
+        int playerCount = 0;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getWorld() == location.getWorld()) {
+                double distance = player.getLocation().distance(location);
+
+                if (distance <= 3000 && (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE)) {
+                    playerCount++;
+                }
+            }
+        }
+
         for (int i = 0; i < amount; i++) {
             LivingEntity e = (LivingEntity) Objects.requireNonNull(location.getWorld()).
                     spawnEntity(location, mobType);
@@ -70,6 +85,14 @@ public class CustomMob {
                     ((Creature) e).setTarget(getNearestPlayer(e));
                 }
             }
+
+            if (playerCount == 0) continue;
+
+            double health = e.getHealth();
+            double additionalHealth = Math.log(healthScale) * playerCount;
+            //System.out.println(health + additionalHealth * 2);
+            Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(health + additionalHealth * 2);
+            e.setHealth(health + additionalHealth * 2);
         }
     }
 
