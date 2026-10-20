@@ -91,7 +91,7 @@ public class CustomMob {
             double health = e.getHealth();
             double additionalHealth = Math.log(healthScale) * playerCount;
             //System.out.println(health + additionalHealth * 2);
-            Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(health + additionalHealth * 2);
+            Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(health + additionalHealth * 2);
             e.setHealth(health + additionalHealth * 2);
         }
     }

@@ -46,7 +46,7 @@ public class ShopSign {
                     ChatColor.RED + failureMessage.replace("<cost>", String.valueOf(calculatedCost)));
             player.playSound(location, Sound.ENTITY_WANDERING_TRADER_NO, .5f, 1.25f);
             if (location.getWorld() == null) return;
-            location.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, player.getLocation().add(0,1.5,0),
+            location.getWorld().spawnParticle(Particle.ANGRY_VILLAGER, player.getLocation().add(0,1.5,0),
                     4, .5, .5, .5);
             return;
         }
@@ -58,7 +58,7 @@ public class ShopSign {
         player.setLevel(player.getLevel() - calculatedCost);
         player.sendMessage(ChatColor.GREEN + successMessage);
         if (location.getWorld() == null) return;
-        location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, player.getLocation().add(0,1.5,0),
+        location.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, player.getLocation().add(0,1.5,0),
                 13, .5, .5, .5);
         player.playSound(location, Sound.ENTITY_VILLAGER_CELEBRATE, .5f, 1.25f);
     }

@@ -3,7 +3,7 @@ package net.simpvp.EventAdditions.commands;
 import net.simpvp.EventAdditions.EventAdditions;
 import net.simpvp.EventAdditions.gameObjects.CustomMob;
 import net.simpvp.EventAdditions.gameObjects.MobWave;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
