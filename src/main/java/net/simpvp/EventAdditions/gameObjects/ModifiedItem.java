@@ -77,6 +77,122 @@ public class ModifiedItem {
                 team = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getTeam(modifierValue.get(0).strip());
             }
 
+
+            // NAD - SelfApply: Applies potion effects directly to the user.
+
+            modifierValue = hasModifyingItemLore(item, "SelfApply");
+
+            for (String s : modifierValue) {
+                String[] separatePotionEffects = s.split(" ");
+
+                boolean effectApplied = player.addPotionEffect(new PotionEffect(
+                        Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])),
+                        Integer.parseInt(separatePotionEffects[1]) * 20,
+                        Integer.parseInt(separatePotionEffects[2]) - 1
+                ));
+
+                // NAD - Audio for affected player
+                if (effectApplied) {
+                    player.playSound(
+                            player.getLocation(),
+                            Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+                            1.0f,
+                            1.0f
+                    );
+
+                    // NAD - Visual around affected player
+                    Location base = player.getLocation();
+                    World world = player.getWorld();
+
+                    double[] heights = {0.25, 0.9, 1.55};
+
+                    for (double height : heights) {
+                        for (int i = 0; i < 8; i++) {
+                            double angle = (Math.PI * 2.0 * i) / 8.0;
+                            double dx = Math.cos(angle);
+                            double dz = Math.sin(angle);
+
+                            Location particleLocation = base.clone().add(0, height, 0);
+
+                            world.spawnParticle(
+                                    Particle.END_ROD,
+                                    particleLocation,
+                                    0,
+                                    dx * 0.10,
+                                    0.03,
+                                    dz * 0.10,
+                                    1.0
+                            );
+                        }
+                    }
+            }
+        }
+
+            // NAD - Team Apply, to allow for buffs to be applied to specific teams
+            // This allows for multiple effects per buff and expandability.
+            modifierValue = hasModifyingItemLore(item, "TeamApply");
+
+            for (String s : modifierValue) {
+                String[] separatePotionEffects = s.split(" ");
+
+                Team targetTeam = Bukkit.getScoreboardManager()
+                        .getMainScoreboard()
+                        .getTeam(separatePotionEffects[0]);
+
+                if (targetTeam == null) {
+                    player.sendMessage(ChatColor.RED + "Team not Found: " + separatePotionEffects[0]);
+                    continue;
+                }
+
+                for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+                    if (Objects.equals(p.getScoreboard().getPlayerTeam(p), targetTeam)) {
+
+                        boolean effectApplied = p.addPotionEffect(new PotionEffect(
+                                Objects.requireNonNull(
+                                        PotionEffectType.getByName(separatePotionEffects[1])
+                                ),
+                                Integer.parseInt(separatePotionEffects[2]) * 20,
+                                Integer.parseInt(separatePotionEffects[3]) - 1
+                        ));
+                        // NAD - Audio for affected player
+                        if (effectApplied) {
+                            p.playSound(
+                                    p.getLocation(),
+                                    Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+                                    1.0f,
+                                    1.0f
+                            );
+
+                            // NAD - Visual for affected player
+                            Location base = p.getLocation();
+                            World world = p.getWorld();
+
+                            double[] heights = {0.25, 0.9, 1.55};
+
+                            for (double height : heights) {
+                                for (int i = 0; i < 8; i++) {
+                                    double angle = (Math.PI * 2.0 * i) / 8.0;
+                                    double dx = Math.cos(angle);
+                                    double dz = Math.sin(angle);
+
+                                    Location particleLocation = base.clone().add(0, height, 0);
+
+                                    world.spawnParticle(
+                                            Particle.END_ROD,
+                                            particleLocation,
+                                            0,
+                                            dx * 0.10,
+                                            0.03,
+                                            dz * 0.10,
+                                            1.0
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             modifierValue = hasModifyingItemLore(item, "Potion");
             if (modifierValue.size() > 0) {
                 int counter = 0;
@@ -94,20 +210,25 @@ public class ModifiedItem {
                                     p.sendMessage(ChatColor.GOLD + "Potion effects received from " + player.getName());
                                 }
 
-                                p.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])), Integer.parseInt(separatePotionEffects[1]) * 20, Integer.parseInt(separatePotionEffects[2]) - 1));
+                                p.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])),
+                                        Integer.parseInt(separatePotionEffects[1]) * 20,
+                                        Integer.parseInt(separatePotionEffects[2]) - 1));
 
                             }
                         }
                         counter += 1;
 
                     } else {
-                        player.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])), Integer.parseInt(separatePotionEffects[1]) * 20, Integer.parseInt(separatePotionEffects[2]) - 1));
+                        player.addPotionEffect(new PotionEffect(Objects.requireNonNull(PotionEffectType.getByName(separatePotionEffects[0])),
+                                Integer.parseInt(separatePotionEffects[1]) * 20,
+                                Integer.parseInt(separatePotionEffects[2]) - 1));
                     }
                 }
             }
         } catch (Exception e) {
             EventAdditions.instance.getLogger().info(e.toString());
         }
+
     }
 
 
@@ -206,7 +327,7 @@ public class ModifiedItem {
         EventListener.modifiedItems.put(projectile.getUniqueId(),this);
     }
 
-    public void summonModifiedPotion() {
+    public void summonModifiedSplash() {
         Location location = player.getLocation();
         location.setY(location.getY() + 1.5);
         ThrownPotion thrownPotion = (ThrownPotion) player.getWorld().spawnEntity(location, EntityType.SPLASH_POTION);
@@ -223,6 +344,22 @@ public class ModifiedItem {
         EventListener.modifiedItems.put(thrownPotion.getUniqueId(), this);
     }
 
+    public void summonModifiedLingering() {
+        Location location = player.getLocation();
+        location.setY(location.getY() + 1.5);
+        ThrownPotion thrownPotion = (ThrownPotion) player.getWorld().spawnEntity(location, EntityType.LINGERING_POTION);
+        thrownPotion.setItem(item);
+        if (throwsFartherScalar <= 0) {
+            thrownPotion.setVelocity((player.getLocation()).getDirection().multiply(.5));
+        } else {
+            thrownPotion.setVelocity((player.getLocation()).getDirection().multiply(throwsFartherScalar));
+        }
+
+        projectileID = thrownPotion.getUniqueId();
+
+        Objects.requireNonNull(location.getWorld()).playSound(location, Sound.ENTITY_SPLASH_POTION_THROW, 1, .1f);
+        EventListener.modifiedItems.put(thrownPotion.getUniqueId(), this);
+    }
 
     public void summonModifiedProjectile() {
 
@@ -235,11 +372,11 @@ public class ModifiedItem {
         }
 
         if (item.getType() == Material.SPLASH_POTION) {
-            summonModifiedPotion();
+            summonModifiedSplash();
         }
 
         if (item.getType() == Material.LINGERING_POTION) {
-            summonModifiedPotion();
+            summonModifiedLingering();
         }
 
     }

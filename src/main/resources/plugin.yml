@@ -1,7 +1,7 @@
 name: EventAdditions
 version: 2.0
 main: net.simpvp.EventAdditions.EventAdditions
-api-version: 1.15
+api-version: 1.21.11
 description: Add features to make better minigames
 commands:
   createflag:

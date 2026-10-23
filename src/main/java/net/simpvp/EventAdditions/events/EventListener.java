@@ -332,6 +332,14 @@ public class EventListener implements Listener {
 
                 ModifiedItem modifiedItem = new ModifiedItem(e.getItem(), e.getPlayer());
 
+                // NAD - Audio Feedback for player casting ability.
+                e.getPlayer().playSound(
+                        e.getPlayer().getLocation(),
+                        Sound.UI_BUTTON_CLICK,
+                        0.8f,
+                        1.2f
+                );
+
                 e.getPlayer().setCooldown(e.getPlayer().getInventory().getItem(Objects.requireNonNull(e.getHand())).getType(), modifiedItem.getCooldownSeconds() * 20);
 
                 if (modifiedItem.isItemThrowable()) {
